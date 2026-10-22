@@ -137,6 +137,12 @@ background-color: rgb(251, 255, 215);</string>
      <height>22</height>
     </rect>
    </property>
+   <property name="inputMask">
+    <string/>
+   </property>
+   <property name="maxLength">
+    <number>10</number>
+   </property>
   </widget>
   <widget class="QLineEdit" name="input_tipo_aparato">
    <property name="geometry">

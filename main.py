@@ -1,8 +1,8 @@
 import sys
 import os
 from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QTableWidgetItem, QInputDialog
-from PySide6.QtGui import QIcon 
-from PySide6.QtCore import QFile
+from PySide6.QtGui import QIcon, QRegularExpressionValidator, QIntValidator, QDoubleValidator 
+from PySide6.QtCore import QFile, QDate, QRegularExpression
 from PySide6.QtUiTools import QUiLoader
 from database import conectar_bd
 import random
@@ -17,6 +17,7 @@ def ruta_recurso(ruta_relativa):
     return os.path.join(ruta_base, ruta_relativa)
 
 
+#Pantalla agendar cita desde el administrador
 class NuevaCitaWindow:
     def __init__(self, parent=None): 
         self.parent = parent
@@ -26,7 +27,9 @@ class NuevaCitaWindow:
         self.ui = loader.load(archivo)
         archivo.close()
         self.ui.setWindowTitle("Agendar Nueva Cita")
-        
+        self.ui.input_fecha.setMinimumDate(QDate.currentDate())
+
+        self.ui.btn_nuevo_aparato.clicked.connect(self.alternar_modo_aparato)
         self.ui.btn_guardar_cita.clicked.connect(self.guardar_cita)
         
         self.ui.combo_cliente.currentIndexChanged.connect(self.cargar_aparatos)
@@ -91,15 +94,60 @@ class NuevaCitaWindow:
             cursor.close()
             conexion.close()
 
+    def alternar_modo_aparato(self):
+        if self.ui.combo_aparato.isEnabled():
+            self.ui.combo_aparato.setEnabled(False)
+        
+            self.ui.txt_nuevo_tipo.setEnabled(True)
+            self.ui.txt_nueva_marca.setEnabled(True)
+        
+            self.ui.btn_nuevo_aparato.setText("Cancelar Nuevo")
+        
+        else:
+            self.ui.combo_aparato.setEnabled(True)
+        
+            self.ui.txt_nuevo_tipo.setEnabled(False)
+            self.ui.txt_nueva_marca.setEnabled(False)
+        
+            self.ui.txt_nuevo_tipo.clear()
+            self.ui.txt_nueva_marca.clear()
+            
+
     def guardar_cita(self):
         id_cliente = self.ui.combo_cliente.currentData()
-        id_aparato = self.ui.combo_aparato.currentData()
         fecha = self.ui.input_fecha.text()
-        costo = self.ui.input_costo_revision.text()
 
-        if not id_cliente or not id_aparato or not fecha or not costo:
+        id_aparato_final = None
+
+        if self.ui.combo_aparato.isEnabled():
+            id_aparato_final = self.ui.combo_aparato.currentData()
+
+            if not id_aparato_final:
+                QMessageBox.warning(self.ui, "Error", "Selecciona un aparato.")
+                return
+
+        else:
+            nuevo_tipo = self.ui.txt_nuevo_tipo.text().strip()
+            nueva_marca = self.ui.txt_nueva_marca.text().strip()
+
+            if not nuevo_tipo or not nueva_marca:
+                QMessageBox.warning(self, "Error", "Debes ingresar el tipo y marca del nuevo aparato.")
+                return
+
+            conexion = conectar_bd()
+            if not conexion: return
+            cursor = conexion.cursor()
+            
+            sql_aparato = "INSERT INTO aparatos (id_cliente, tipo, marca) VALUES (%s, %s, %s) RETURNING id"
+            cursor.execute(sql_aparato, (id_cliente, nuevo_tipo, nueva_marca))
+            id_aparato_final = cursor.fetchone()[0]
+
+            conexion.commit()
+
+        if not id_cliente or not fecha:
             QMessageBox.warning(self.ui, "Error", "Llena todos los campos.")
             return
+
 
         letras_numeros = string.ascii_uppercase + string.digits
         codigo_aleatorio = ''.join(random.choices(letras_numeros, k=5))
@@ -110,23 +158,15 @@ class NuevaCitaWindow:
         try:
             cursor = conexion.cursor()
             
-            sql = """
-                INSERT INTO servicios (id_aparato, fecha_visita, estado, costo_revision, folio_seguimiento) 
-                VALUES (%s, %s, %s, %s, %s)
-            """
-
-            valores = (
-                id_aparato, 
-                fecha,          
-                "Pendiente",             
-                costo,                    
-                folio                     
-            )
-
-            cursor.execute(sql, valores)
+            sql_servicio = """
+            INSERT INTO servicios (id_aparato, fecha_visita, estado, costo_revision, costo_mano_obra, folio_seguimiento) 
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """
+            valores_servicio = (id_aparato_final, fecha, "Pendiente", 0.00, 0.00, folio)
+            cursor.execute(sql_servicio, valores_servicio)
             conexion.commit() 
             
-            QMessageBox.information(self.ui, "Éxito", f"Cita agendada.\nFolio del cliente: {folio}")
+            QMessageBox.information(self.ui, "Éxito", f"Cita agendada.\nFolio del cliente: {folio}. Cambie el estado de la cita a 'En revisión' para agregar el costo de revisión.")
 
             if self.parent:
                 self.parent.cargar_citas()
@@ -141,6 +181,7 @@ class NuevaCitaWindow:
             conexion.close()
 
 
+#Pantalla agregar refaccion a una cita
 class AgregarPiezaWindow:
     def __init__(self, parent=None, folio=""):
         self.parent = parent
@@ -155,6 +196,8 @@ class AgregarPiezaWindow:
         self.ui.setWindowTitle(f"Agregar Pieza - Folio: {self.folio}")
         
         self.cargar_inventario_combo()
+
+        self.ui.input_cantidad.setValidator(validador_numeros)
         
         self.ui.combo_refaccion.currentIndexChanged.connect(self.actualizar_etiquetas)
         self.ui.btn_guardar_pieza.clicked.connect(self.guardar_pieza)
@@ -250,6 +293,7 @@ class AgregarPiezaWindow:
             if 'conexion' in locals(): conexion.close()
 
 
+#Pantalla guardar nueva refacción
 class NuevaRefaccionWindow:
     def __init__(self, parent=None):
         self.parent = parent
@@ -262,6 +306,10 @@ class NuevaRefaccionWindow:
         self.ui.setWindowTitle("Registrar Nueva Refacción")
         
         self.cargar_proveedores_combo()
+
+        self.ui.input_stock.setValidator(validador_stock)
+        self.ui.input_costo.setValidator(validador_dinero)
+        self.ui.input_precio.setValidator(validador_dinero)
         
         self.ui.btn_guardar_refaccion.clicked.connect(self.guardar_refaccion)
 
@@ -325,6 +373,7 @@ class NuevaRefaccionWindow:
             conexion.close()
 
 
+#Pantalla dashboard administrador
 class DashboardAdmin:
     def __init__(self):
         loader = QUiLoader()
@@ -370,7 +419,7 @@ class DashboardAdmin:
                 a.tipo || ' ' || a.marca AS aparato,
                 s.fecha_visita,
                 s.estado,
-                (COALESCE(s.costo_revision, 0) + COALESCE(SUM(d.cantidad * d.precio_unitario), 0)) AS total
+                (COALESCE(s.costo_revision, 0) + COALESCE(s.costo_mano_obra, 0) + COALESCE(SUM(d.cantidad * d.precio_unitario), 0)) AS total            
             FROM servicios s
             JOIN aparatos a ON s.id_aparato = a.id 
             JOIN clientes c ON a.id_cliente = c.id
@@ -387,12 +436,16 @@ class DashboardAdmin:
                 self.ui.tabla_citas.insertRow(fila_num)
                 
                 for col_num, dato in enumerate(cita):
-                    
-                    if col_num == 5:
-                        texto_celda = f"${dato:.2f}"
+
+                    if dato is None or str(dato).strip() == "":
+                        texto_celda = "N/E"
+
+                    elif col_num == 5:
+                            texto_celda = f"${dato:.2f}"
+
                     else:
                         texto_celda = str(dato)
-                        
+        
                     celda = QTableWidgetItem(texto_celda)
                     self.ui.tabla_citas.setItem(fila_num, col_num, celda)
 
@@ -414,16 +467,13 @@ class DashboardAdmin:
             SELECT 
                 c.id,
                 TRIM(c.nombre || ' ' || c.apellido_paterno || ' ' || COALESCE(c.apellido_materno, '')) AS nombre_completo,
-                c.telefono,
-                
-                -- NUEVA COLUMNA: Unimos la dirección separada por comas
+                c.telefono,                
                 CONCAT_WS(', ', 
                     NULLIF(TRIM(c.calle || ' ' || COALESCE(c.numero, '')), ''), 
                     NULLIF(c.colonia, ''), 
                     NULLIF(c.codigo_postal, ''), 
                     NULLIF(c.municipio, '')
-                ) AS direccion_completa,
-                
+                ) AS direccion_completa,                
                 COUNT(DISTINCT a.id) AS total_aparatos,
                 MAX(s.fecha_visita) AS ultima_visita
             FROM clientes c
@@ -441,9 +491,10 @@ class DashboardAdmin:
                 self.ui.tabla_clientes.insertRow(fila_num)
                 
                 for col_num, dato in enumerate(cliente):
-                    
-                    if col_num == 4:
-                        texto_celda = str(dato) if dato else "Sin visitas"
+
+                    if dato is None or str(dato).strip() == "":
+                        texto_celda = "N/E"
+                            
                     else:
                         texto_celda = str(dato)
                         
@@ -472,7 +523,7 @@ class DashboardAdmin:
         folio = self.ui.tabla_citas.item(fila, 0).text()
         estado_actual = self.ui.tabla_citas.item(fila, 4).text()
 
-        estados = ["Pendiente", "En Revisión", "Esperando Aprobación", "Terminado", "Cancelado"]
+        estados = ["Pendiente", "En revisión", "Esperando aprobación del cliente", "En servicio", "Terminado", "Cancelado"]
         
         try:
             indice_actual = estados.index(estado_actual)
@@ -494,7 +545,7 @@ class DashboardAdmin:
         sql = ""
         valores = ()
 
-        if nuevo_estado == "En Revisión": 
+        if nuevo_estado == "En revisión": 
             costo, ok_costo = QInputDialog.getDouble(
                 self.ui,
                 "Costo de Revisión",
@@ -510,6 +561,24 @@ class DashboardAdmin:
                 valores = (nuevo_estado, costo, folio)
             else:
                 return
+
+        elif nuevo_estado == "Esperando aprobación del cliente":
+            costo_mano_obra, ok_mano_obra = QInputDialog.getDouble(
+                self.ui,
+                "Costo de Mano de Obra",
+                "Ingresa el costo por la mano de obra, es decir, el costo del servicio como tal:",
+                500.00,    
+                0.00,      
+                30000.00,  
+                2          
+            )
+            
+            if ok_mano_obra:
+                sql = "UPDATE servicios SET estado = %s, costo_mano_obra = %s WHERE folio_seguimiento = %s"
+                valores = (nuevo_estado, costo_mano_obra, folio)
+            else:
+                return
+
 
         else:
             sql = "UPDATE servicios SET estado = %s WHERE folio_seguimiento = %s"
@@ -528,7 +597,7 @@ class DashboardAdmin:
             
         except Exception as e:
             conexion.rollback()
-            QMessageBox.critical(self.ui, "Error BD", f"Fallo al actualizar:\n{e}")
+            QMessageBox.critical(self.ui, "Error en la base de datos", f"Fallo al actualizar:\n{e}")
         finally:
             cursor.close()
             conexion.close()
@@ -632,19 +701,33 @@ class DashboardAdmin:
         try:
             cursor = conexion.cursor()
             sql = """
-                SELECT id, nombre, stock, precio_publico, (precio_publico - precio_compra) AS margen 
-                FROM refacciones 
-                ORDER BY nombre ASC
-            """
+            SELECT 
+                r.id,
+                r.nombre,
+                r.stock,
+                r.precio_compra,
+                (r.precio_publico - r.precio_compra) AS margen,
+                p.empresa AS proveedor
+            FROM refacciones r
+            LEFT JOIN proveedores p ON r.id_proveedor = p.id
+            ORDER BY r.id DESC
+        """
             cursor.execute(sql)
             refacciones = cursor.fetchall()
             
             self.ui.tabla_inventario.setRowCount(0)
+
             for fila_num, ref in enumerate(refacciones):
                 self.ui.tabla_inventario.insertRow(fila_num)
+
                 for col_num, dato in enumerate(ref):
-                    if col_num in [3, 4]:
+                    
+                    if dato is None or str(dato).strip() == "":
+                        texto_celda = "N/E"
+
+                    elif col_num in [3, 4]:
                         texto_celda = f"${dato:.2f}"
+
                     else:
                         texto_celda = str(dato)
                         
@@ -697,7 +780,13 @@ class DashboardAdmin:
                 self.ui.tabla_proveedores.insertRow(fila_num)
                 
                 for col_num, dato in enumerate(proveedor):
-                    texto_celda = str(dato) if dato else ""
+                    
+                    if dato is None or str(dato).strip() == "":
+                        texto_celda = "N/E"
+
+                    else:
+                        texto_celda = str(dato)
+
                     celda = QTableWidgetItem(texto_celda)
                     self.ui.tabla_proveedores.setItem(fila_num, col_num, celda)
             self.ui.tabla_proveedores.setColumnHidden(0, True)
@@ -764,6 +853,10 @@ class EditarStockWindow:
         
         self.ui.setWindowTitle("Actualizar Inventario")
         self.ui.lbl_nombre_pieza.setText(f"Editando: {nombre}")
+
+        self.ui.input_sumar_stock.setValidator(validador_stock)
+        self.ui.input_nuevo_costo.setValidator(validador_dinero)
+        self.ui.input_nuevo_precio.setValidator(validador_dinero)
         
         self.ui.input_nuevo_costo.setText(str(costo))
         self.ui.input_nuevo_precio.setText(str(precio))
@@ -825,7 +918,17 @@ class AgendarClienteWindow:
         archivo.open(QFile.ReadOnly)
         self.ui = loader.load(archivo)
         archivo.close()
-        
+        self.ui.input_fecha.setMinimumDate(QDate.currentDate())
+
+        self.ui.input_nombre.setValidator(validador_letras)
+        self.ui.input_apellidop.setValidator(validador_letras)
+        self.ui.input_apellidom.setValidator(validador_letras)
+        self.ui.input_telefono.setValidator(validador_numeros)
+        self.ui.txt_cp.setValidator(validador_numeros)
+        self.ui.txt_municipio.setValidator(validador_letras)
+
+        self.ui.input_telefono.setMaxLength(10)
+
         self.ui.setWindowTitle("Agendar Reparación")
         self.ui.btn_confirmar_cita.clicked.connect(self.procesar_agendamiento)
 
@@ -903,6 +1006,7 @@ class AgendarClienteWindow:
             cursor.close()
             conexion.close()
 
+
 #Pantalla nuevo cliente desde admin
 class NuevoClienteWindow:
     def __init__(self, parent=None):
@@ -912,6 +1016,15 @@ class NuevoClienteWindow:
         archivo.open(QFile.ReadOnly)
         self.ui = loader.load(archivo)
         archivo.close()
+
+        self.ui.input_nombre.setValidator(validador_letras)
+        self.ui.input_paterno.setValidator(validador_letras)
+        self.ui.input_materno.setValidator(validador_letras)
+        self.ui.input_telefono.setValidator(validador_numeros)
+        self.ui.txt_cp.setValidator(validador_numeros)
+        self.ui.txt_municipio.setValidator(validador_letras)
+
+        self.ui.input_telefono.setMaxLength(10)
         
         self.ui.setWindowTitle("Registrar Cliente Manual")
         self.ui.btn_guardar.clicked.connect(self.guardar_cliente)
@@ -997,21 +1110,22 @@ class HistorialClienteWindow:
             
             #Consulta de historial del cliente
             sql = """
-                SELECT 
-                    s.folio_seguimiento,
-                    a.tipo || ' ' || a.marca AS aparato,
-                    s.fecha_visita,
-                    s.estado,
-                    (s.costo_revision + COALESCE(SUM(ds.cantidad * ds.precio_unitario), 0)) AS total_pagado
-                FROM servicios s
-                JOIN aparatos a ON s.id_aparato = a.id
-                LEFT JOIN detalle_servicio ds ON s.id = ds.id_servicio
-                WHERE a.id_cliente = %s
-                GROUP BY 
-                    s.id, s.folio_seguimiento, a.tipo, a.marca, 
-                    s.fecha_visita, s.estado, s.costo_revision
-                ORDER BY s.fecha_visita DESC
-            """
+            SELECT 
+                s.folio_seguimiento,
+                a.tipo || ' ' || a.marca AS aparato,
+                s.fecha_visita,
+                s.estado,
+                (COALESCE(s.costo_revision, 0) + COALESCE(s.costo_mano_obra, 0) + COALESCE(SUM(d.cantidad * d.precio_unitario), 0)) AS total_pagado
+            FROM servicios s
+            JOIN aparatos a ON s.id_aparato = a.id
+            -- Corregimos el alias a "d" para que coincida con la suma matemática
+            LEFT JOIN detalle_servicio d ON s.id = d.id_servicio
+            WHERE a.id_cliente = %s
+            GROUP BY 
+                s.id, s.folio_seguimiento, a.tipo, a.marca,
+                s.fecha_visita, s.estado, s.costo_revision, s.costo_mano_obra -- Agregamos el costo de mano de obra aquí
+            ORDER BY s.fecha_visita DESC
+        """
             cursor.execute(sql, (self.id_cliente,))
             historial = cursor.fetchall()
             
@@ -1048,6 +1162,9 @@ class NuevoProveedorWindow:
         archivo.close()
         
         self.ui.setWindowTitle("Registrar Nuevo Proveedor")
+
+        self.ui.input_telefono.setValidator(validador_numeros)
+        self.ui.input_telefono.setMaxLength(10)
         
         self.ui.btn_guardar_proveedor.clicked.connect(self.guardar_proveedor)
 
@@ -1123,7 +1240,7 @@ class DashboardCliente:
                     c.nombre,
                     a.tipo || ' ' || a.marca AS aparato,
                     s.estado,
-                    (s.costo_revision + COALESCE(SUM(d.cantidad * d.precio_unitario), 0)) AS total
+                    (COALESCE(s.costo_revision, 0) + COALESCE(s.costo_mano_obra, 0) + COALESCE(SUM(d.cantidad * d.precio_unitario), 0)) AS total
                 FROM servicios s
                 JOIN aparatos a ON s.id_aparato = a.id
                 JOIN clientes c ON a.id_cliente = c.id
@@ -1146,7 +1263,8 @@ class DashboardCliente:
                     self.ui.lbl_estado.setStyleSheet("color: green; font-weight: bold; font-size: 14px;")
                     
             else:
-                QMessageBox.warning(self.ui, "No encontrado", "No existe ninguna cita con ese folio. Verifica y vuelve a intentar.")
+                QMessageBox.warning(self.ui, "No encontrado", "No existe ninguna cita con ese folio. Verifica que tu folio" \
+                "                               sea correcto, y vuelve a intentar.")
                 self.ui.lbl_cliente.setText("")
                 self.ui.lbl_aparato.setText("")
                 self.ui.lbl_estado.setText("")
@@ -1181,6 +1299,7 @@ class LoginWindow(QMainWindow):
         self.setWindowTitle("Acceso Administrador")
 
         self.ui.btn_entrar.clicked.connect(self.verificar_login)
+        self.ui.btn_volver.clicked.connect(self.volver_bienvenida)
 
     def verificar_login(self):
         usuario_texto = self.ui.input_usuario.text()
@@ -1216,6 +1335,11 @@ class LoginWindow(QMainWindow):
         finally:
             cursor.close()
             conexion.close()
+
+    def volver_bienvenida(self):
+        self.ventana_inicio = BienvenidaWindow()
+        self.ventana_inicio.show()
+        self.close()
             
 #Pantalla inicial
 class BienvenidaWindow(QMainWindow):
@@ -1248,6 +1372,16 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
 
     os.chdir(ruta_recurso("."))
+
+    regla_texto = QRegularExpression(r"^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$")
+    validador_letras = QRegularExpressionValidator(regla_texto)
+
+    regla_numeros = QRegularExpression(r"^[0-9]+$")
+    validador_numeros = QRegularExpressionValidator(regla_numeros)
+
+    validador_stock = QIntValidator(0, 9999)
+    validador_dinero = QDoubleValidator(0.00, 99999.99, 2)
+    validador_dinero.setNotation(QDoubleValidator.StandardNotation)
     
     app.setWindowIcon(QIcon(ruta_recurso("icono.png")))
     ventana = BienvenidaWindow()

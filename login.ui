@@ -68,11 +68,14 @@
   <widget class="QPushButton" name="btn_entrar">
    <property name="geometry">
     <rect>
-     <x>180</x>
+     <x>110</x>
      <y>190</y>
      <width>75</width>
      <height>24</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(215, 255, 188);</string>
    </property>
    <property name="text">
     <string>Ingresar</string>
@@ -134,6 +137,22 @@
    </property>
    <property name="scaledContents">
     <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btn_volver">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>190</y>
+     <width>75</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(200, 200, 200);</string>
+   </property>
+   <property name="text">
+    <string>Volver</string>
    </property>
   </widget>
  </widget>
