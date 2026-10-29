@@ -261,14 +261,13 @@ class AgregarPiezaWindow:
             if not resultado: return
             id_servicio = resultado[0]
             
-            nombre_pieza = self.ui.combo_refaccion.currentText()
             sql_detalle = """
-                INSERT INTO detalle_servicio (id_servicio, id_refaccion, descripcion, cantidad, precio_unitario)
-                VALUES (%s, %s, %s, %s, %s)
+                INSERT INTO detalle_servicio (id_servicio, id_refaccion, cantidad, precio_unitario)
+                VALUES (%s, %s, %s, %s)
                 ON CONFLICT (id_servicio, id_refaccion) 
                 DO UPDATE SET cantidad = detalle_servicio.cantidad + EXCLUDED.cantidad;
             """
-            cursor.execute(sql_detalle, (id_servicio, datos['id'], nombre_pieza, cantidad, datos['precio']))
+            cursor.execute(sql_detalle, (id_servicio, datos['id'], cantidad, datos['precio']))
             
             sql_restar_stock = "UPDATE refacciones SET stock = stock - %s WHERE id = %s"
             cursor.execute(sql_restar_stock, (cantidad, datos['id']))
@@ -383,10 +382,24 @@ class DashboardAdmin:
         archivo.close()
         self.ui.setWindowTitle("Panel de Control - Multiservicios")
 
+        self.ui.input_nueva_pass.setMaxLength(8)
+        self.ui.input_confirmar_pass.setMaxLength(8)
+        self.ui.input_nuevo_usuario.setMaxLength(6)
+        self.ui.input_nuevo_nombre.setMaxLength(25)
+
+        regex_numeros = QRegularExpression(r"^[0-9]+$")
+        validador_numeros = QRegularExpressionValidator(regex_numeros)
+        self.ui.input_nuevo_usuario.setValidator(validador_numeros)
+
         self.ui.btn_nueva_cita.clicked.connect(self.abrir_nueva_cita)
         self.ui.btn_editar_estado.clicked.connect(self.editar_estado)
         self.ui.btn_agregar_pieza.clicked.connect(self.abrir_agregar_pieza)
         self.ui.btn_eliminar_cita.clicked.connect(self.eliminar_cita)
+        self.ui.btn_actualizar_fecha.clicked.connect(self.actualizar_fecha_admin)
+        self.ui.tabla_citas.itemSelectionChanged.connect(self.mostrar_diagnostico_seleccionado)
+
+        self.ui.dt_fecha_admin.setMinimumDate(QDate.currentDate())
+
         self.ui.btn_salir.clicked.connect(self.cerrar_sesion)
 
         self.cargar_citas()
@@ -402,6 +415,8 @@ class DashboardAdmin:
 
         self.ui.btn_nuevo_proveedor.clicked.connect(self.abrir_nuevo_proveedor)
         self.ui.btn_eliminar_proveedor.clicked.connect(self.eliminar_proveedor)
+
+        self.ui.btn_nuevo_admin.clicked.connect(self.crear_nuevo_admin)
 
         self.ui.showMaximized()
 
@@ -419,7 +434,11 @@ class DashboardAdmin:
                 a.tipo || ' ' || a.marca AS aparato,
                 s.fecha_visita,
                 s.estado,
-                (COALESCE(s.costo_revision, 0) + COALESCE(s.costo_mano_obra, 0) + COALESCE(SUM(d.cantidad * d.precio_unitario), 0)) AS total            
+                CASE 
+                    WHEN s.estado = 'Cancelado' THEN COALESCE(s.costo_revision, 0)
+                    ELSE (COALESCE(s.costo_revision, 0) + COALESCE(s.costo_mano_obra, 0) + COALESCE(SUM(d.cantidad * d.precio_unitario), 0))
+                END AS total,
+                TO_CHAR(s.fecha_estimada, 'DD-MM-YYYY') AS fecha_entrega            
             FROM servicios s
             JOIN aparatos a ON s.id_aparato = a.id 
             JOIN clientes c ON a.id_cliente = c.id
@@ -515,6 +534,11 @@ class DashboardAdmin:
 
     def editar_estado(self):
         fila = self.ui.tabla_citas.currentRow()
+
+        conexion = conectar_bd()
+        if not conexion: return
+
+        cursor = conexion.cursor()
         
         if fila == -1:
             QMessageBox.warning(self.ui, "Atención", "Selecciona una cita de la tabla primero.")
@@ -563,37 +587,80 @@ class DashboardAdmin:
                 return
 
         elif nuevo_estado == "Esperando aprobación del cliente":
-            costo_mano_obra, ok_mano_obra = QInputDialog.getDouble(
-                self.ui,
-                "Costo de Mano de Obra",
-                "Ingresa el costo por la mano de obra, es decir, el costo del servicio como tal:",
-                500.00,    
-                0.00,      
-                30000.00,  
-                2          
-            )
+
+            diagnostico, ok_diag = QInputDialog.getMultiLineText(
+                self.ui, "Diagnóstico del Equipo", "Ingresa el diagnóstico y los detalles de la reparación propuesta:")
+
+            if ok_diag:
+
+                costo_mano_obra, ok_mano_obra = QInputDialog.getDouble(
+                    self.ui,
+                    "Costo de Mano de Obra",
+                    "Ingresa el costo por la mano de obra, es decir, el costo del servicio como tal:",
+                    500.00,    
+                    0.00,      
+                    30000.00,  
+                    2          
+                )
             
-            if ok_mano_obra:
-                sql = "UPDATE servicios SET estado = %s, costo_mano_obra = %s WHERE folio_seguimiento = %s"
-                valores = (nuevo_estado, costo_mano_obra, folio)
+                if ok_mano_obra:
+                    sql = "UPDATE servicios SET estado = %s, costo_mano_obra = %s, diagnostico = %s WHERE folio_seguimiento = %s"
+                    valores = (nuevo_estado, costo_mano_obra, diagnostico, folio)
+                
+                else:
+                    return
             else:
                 return
 
+        elif nuevo_estado == "Cancelado":
+            confirmacion = QMessageBox.question(
+                self.ui, 
+                "Confirmar Cancelación", 
+                "¿Estás seguro de cancelar este servicio? Las piezas cotizadas regresarán al inventario de inmediato.",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            )
+            
+            if confirmacion == QMessageBox.StandardButton.Yes:
+                cursor.execute("SELECT id FROM servicios WHERE folio_seguimiento = %s", (folio,))
+                resultado_id = cursor.fetchone()
+                
+                if resultado_id:
+                    id_servicio = resultado_id[0]
+                    
+                    cursor.execute("SELECT cantidad, id_refaccion FROM detalle_servicio WHERE id_servicio = %s", (id_servicio,))
+                    piezas_usadas = cursor.fetchall()
+
+                    QMessageBox.information(self.ui, "Diagnóstico", f"Python encontró {len(piezas_usadas)} piezas para devolver de este folio.")
+                    
+                    if piezas_usadas:
+                        for pieza in piezas_usadas:
+                                cantidad_devolver = pieza[0]
+                                id_pieza = pieza[1]
+                                
+                                cursor.execute("UPDATE refacciones SET stock = stock + %s WHERE id = %s", (cantidad_devolver, id_pieza))
+                                
+                                if cursor.rowcount == 0:
+                                    QMessageBox.warning(self.ui, "Falla en Inventario", f"La base de datos ignoró la pieza con ID {id_pieza}. Verifica si aún existe en tu catálogo.")
+
+
+                sql = "UPDATE servicios SET estado = %s, costo_mano_obra = 0 WHERE folio_seguimiento = %s"
+                valores = (nuevo_estado, folio)
+            
+            else:
+                return    
 
         else:
             sql = "UPDATE servicios SET estado = %s WHERE folio_seguimiento = %s"
             valores = (nuevo_estado, folio)
 
-        conexion = conectar_bd()
-        if not conexion: return
         
         try:
-            cursor = conexion.cursor()
             cursor.execute(sql, valores)
             conexion.commit()
             
             QMessageBox.information(self.ui, "Éxito", f"El servicio {folio} ahora está '{nuevo_estado}'.")
             self.cargar_citas()
+            self.cargar_inventario()
             
         except Exception as e:
             conexion.rollback()
@@ -645,6 +712,9 @@ class DashboardAdmin:
 
     def eliminar_cita(self):
         fila = self.ui.tabla_citas.currentRow()
+
+        conexion = conectar_bd()
+        if not conexion: return
         
         if fila == -1:
             QMessageBox.warning(self.ui, "Atención", "Selecciona la cita que deseas eliminar.")
@@ -653,36 +723,97 @@ class DashboardAdmin:
         folio = self.ui.tabla_citas.item(fila, 0).text()
         cliente = self.ui.tabla_citas.item(fila, 1).text()
 
-        respuesta = QMessageBox.warning(
-            self.ui, 
-            "Peligro: Borrar Registro", 
-            f"¿Estás absolutamente seguro de querer eliminar la cita {folio} de {cliente}?\n\nEsta acción borrará el servicio de la base de datos para siempre y no se puede deshacer.",
-            QMessageBox.Yes | QMessageBox.Cancel, 
-            QMessageBox.Cancel
-        )
-
-        if respuesta == QMessageBox.Yes:
-            conexion = conectar_bd()
-            if not conexion: return
+        try:
+            cursor = conexion.cursor()
+        
+            cursor.execute("SELECT id, estado FROM servicios WHERE folio_seguimiento = %s", (folio,))
+            resultado = cursor.fetchone()
+        
+            if not resultado:
+                return 
             
-            try:
-                cursor = conexion.cursor()
-                
-                sql = "DELETE FROM servicios WHERE folio_seguimiento = %s"
-                cursor.execute(sql, (folio,))
-                
+            id_servicio = resultado[0]
+            estado_actual = resultado[1]
+        
+            if estado_actual != 'Cancelado':
+                QMessageBox.warning(
+                self.ui, 
+                "Operación Denegada", 
+                "Solo puedes eliminar de la base de datos las citas que ya estén en estado 'Cancelado'.\n\nSi necesitas borrarla, cancélala primero para asegurar que las piezas regresen al inventario."
+                )
+                return
+            
+            confirmacion = QMessageBox.question(
+                self.ui, 
+                "Eliminar Cita", 
+                f"¿Estás seguro de eliminar permanentemente el folio {folio}? Esta acción no se puede deshacer.",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            )
+        
+            if confirmacion == QMessageBox.StandardButton.Yes:
+                cursor.execute("DELETE FROM detalle_servicio WHERE id_servicio = %s", (id_servicio,))
+                cursor.execute("DELETE FROM servicios WHERE id = %s", (id_servicio,))
+            
                 conexion.commit()
-                
-                QMessageBox.information(self.ui, "Eliminado", f"El folio {folio} ha sido eliminado con éxito.")
-                
-                self.cargar_citas()
-                
-            except Exception as e:
-                conexion.rollback()
-                QMessageBox.critical(self.ui, "Error BD", f"Fallo al eliminar:\n{e}")
-            finally:
-                cursor.close()
-                conexion.close()
+                QMessageBox.information(self.ui, "Éxito", "La cita y su historial de piezas han sido eliminados por completo.")
+            
+                self.cargar_citas() 
+            
+        except Exception as e:
+            conexion.rollback()
+            QMessageBox.critical(self.ui, "Error al eliminar", f"Fallo en la base de datos: {str(e)}")
+
+    def actualizar_fecha_admin(self):
+        fila = self.ui.tabla_citas.currentRow()
+
+        conexion = conectar_bd()
+
+        if fila == -1:
+            QMessageBox.warning(self.ui, "Selección requerida", "Por favor, selecciona una cita de la tabla para cambiar su fecha.")
+            return
+        
+        folio = self.ui.tabla_citas.item(fila, 0).text()
+    
+        nueva_fecha_bd = self.ui.dt_fecha_admin.date().toString("yyyy-MM-dd")
+    
+        try:
+            cursor = conexion.cursor()
+            sql = "UPDATE servicios SET fecha_estimada = %s WHERE folio_seguimiento = %s"
+            cursor.execute(sql, (nueva_fecha_bd, folio))
+        
+            conexion.commit()
+            QMessageBox.information(self.ui, "Éxito", "La fecha de entrega estimada ha sido actualizada.")
+        
+            self.cargar_citas() 
+        
+        except Exception as e:
+            conexion.rollback()
+            QMessageBox.critical(self.ui, "Error", f"No se pudo actualizar la fecha: {str(e)}")
+
+    def mostrar_diagnostico_seleccionado(self):
+        fila = self.ui.tabla_citas.currentRow()
+
+        conexion = conectar_bd()
+
+        if fila == -1:
+            self.ui.txt_diagnostico_admin.clear()
+            return
+        
+        folio = self.ui.tabla_citas.item(fila, 0).text()
+    
+        try:
+            cursor = conexion.cursor()
+            cursor.execute("SELECT diagnostico FROM servicios WHERE folio_seguimiento = %s", (folio,))
+            resultado = cursor.fetchone()
+        
+            if resultado and resultado[0]:
+                self.ui.txt_diagnostico_admin.setText(resultado[0])
+            else:
+                self.ui.txt_diagnostico_admin.setText("Sin diagnóstico registrado aún. Registre un diagnóstico después de agregar refacciones a una cita" \
+                " y cambiar el estado a 'Esperando aprobación del cliente', donde ingresará también el costo de la mano de obra.")
+            
+        except Exception as e:
+            self.ui.txt_diagnostico_admin.setText(f"Error al cargar: {str(e)}")
 
     def cerrar_sesion(self):
         respuesta = QMessageBox.question(
@@ -705,7 +836,7 @@ class DashboardAdmin:
                 r.id,
                 r.nombre,
                 r.stock,
-                r.precio_compra,
+                r.precio_publico,
                 (r.precio_publico - r.precio_compra) AS margen,
                 p.empresa AS proveedor
             FROM refacciones r
@@ -837,6 +968,53 @@ class DashboardAdmin:
             finally:
                 cursor.close()
                 conexion.close()
+
+    def crear_nuevo_admin(self):
+
+        conexion = conectar_bd()
+
+        nuevo_usuario = self.ui.input_nuevo_usuario.text().strip()
+        nuevo_nombre = self.ui.input_nuevo_nombre.text().strip()
+        nueva_pass = self.ui.input_nueva_pass.text()
+        confirmar_pass = self.ui.input_confirmar_pass.text()
+        pass_actual_ingresada = self.ui.input_pass_actual.text()
+    
+        if not all([nuevo_usuario, nuevo_nombre, nueva_pass, confirmar_pass, pass_actual_ingresada]):
+            QMessageBox.warning(self.ui, "Campos Incompletos", "Por favor llena todos los campos.")
+            return
+        
+        if nueva_pass != confirmar_pass:
+            QMessageBox.warning(self.ui, "Error de Contraseña", "Las contraseñas del nuevo usuario no coinciden.")
+            return
+        
+        try:
+            cursor = conexion.cursor()
+        
+            cursor.execute("SELECT password FROM usuarios WHERE usuario = %s", (self.usuario_actual,))
+            resultado = cursor.fetchone()
+        
+            if not resultado or resultado[0] != pass_actual_ingresada:
+                QMessageBox.critical(self.ui, "Acceso Denegado", "Tu contraseña de administrador actual es incorrecta. Operación cancelada.")
+                return
+            
+            sql_insert = "INSERT INTO usuarios (nombre_corto, usuario, password) VALUES (%s, %s, %s)"
+            cursor.execute(sql_insert, (nuevo_nombre, nuevo_usuario, nueva_pass))
+            conexion.commit()
+        
+            QMessageBox.information(self.ui, "Éxito", f"El administrador '{nuevo_usuario}' ha sido creado correctamente.")
+        
+            self.ui.input_nuevo_usuario.clear()
+            self.ui.input_nuevo_nombre.clear()
+            self.ui.input_nueva_pass.clear()
+            self.ui.input_confirmar_pass.clear()
+            self.ui.input_pass_actual.clear()
+        
+        except Exception as e:
+            conexion.rollback()
+            if "Unique violation" in str(e) or "llave duplicada" in str(e).lower():
+                QMessageBox.warning(self.ui, "Usuario Duplicado", "Ese nombre de usuario ya está registrado. Elige otro.")
+            else:
+                QMessageBox.critical(self.ui, "Error", f"Ocurrió un error en la base de datos: {str(e)}")
 
 
 #Pantalla editar stock o precio desde el admin
@@ -1221,6 +1399,8 @@ class DashboardCliente:
         self.ui.btn_volver.clicked.connect(self.volver_inicio)
 
         self.ui.btn_agendar_nueva.clicked.connect(self.abrir_agendar)
+        self.ui.btn_aprobar.clicked.connect(self.aprobar_presupuesto)
+        self.ui.btn_rechazar.clicked.connect(self.rechazar_presupuesto)
 
     def buscar_folio(self):
         folio_texto = self.ui.input_folio.text().strip().upper()
@@ -1240,41 +1420,152 @@ class DashboardCliente:
                     c.nombre,
                     a.tipo || ' ' || a.marca AS aparato,
                     s.estado,
-                    (COALESCE(s.costo_revision, 0) + COALESCE(s.costo_mano_obra, 0) + COALESCE(SUM(d.cantidad * d.precio_unitario), 0)) AS total
+                    CASE 
+                        WHEN s.estado = 'Cancelado' THEN COALESCE(s.costo_revision, 0)
+                        ELSE (COALESCE(s.costo_revision, 0) + COALESCE(s.costo_mano_obra, 0) + COALESCE(SUM(d.cantidad * d.precio_unitario), 0))
+                    END AS total,
+                    s.diagnostico,
+                    TO_CHAR(s.fecha_estimada, 'DD-MM-YYYY') AS fecha_entrega
                 FROM servicios s
                 JOIN aparatos a ON s.id_aparato = a.id
                 JOIN clientes c ON a.id_cliente = c.id
                 LEFT JOIN detalle_servicio d ON d.id_servicio = s.id
                 WHERE s.folio_seguimiento = %s
-                GROUP BY s.id, c.nombre, a.tipo, a.marca
+                GROUP BY s.id, c.nombre, a.tipo, a.marca, s.diagnostico, s.fecha_estimada
             """
             cursor.execute(sql, (folio_texto,))
             resultado = cursor.fetchone()
             
             if resultado:
+
+                self.folio_confirmado = folio_texto
                 self.ui.lbl_cliente.setText(f"Cliente: {resultado[0]}")
-                self.ui.lbl_aparato.setText(f"Equipo: {resultado[1]}")
+                self.ui.lbl_aparato.setText(f"Aparato: {resultado[1]}")
                 self.ui.lbl_estado.setText(f"Estado Actual: {resultado[2]}")
                 self.ui.lbl_total.setText(f"Total a pagar: ${resultado[3]:.2f}")
                 
+
+                diagnostico_bd = resultado[4]
+                if diagnostico_bd:
+                    self.ui.lbl_diagnostico.setText(f"Diagnóstico: {diagnostico_bd}")
+                else:
+                    self.ui.lbl_diagnostico.setText("Diagnóstico: Tu aparato aún no ha sido revisado.")
+
+                if resultado[2] == 'Esperando aprobación del cliente':
+                    self.ui.btn_aprobar.setEnabled(True)
+                    self.ui.btn_rechazar.setEnabled(True)
+                    self.ui.lbl_fecha_entrega.setText("Fecha de entrega estimada: Esperando a que se apruebe el servicio.")
+                else:
+                    self.ui.btn_aprobar.setEnabled(False)
+                    self.ui.btn_rechazar.setEnabled(False)
+
+                    if resultado[2] == 'En Servicio' and resultado[5]:
+                        self.ui.lbl_fecha_entrega.setText(f"Fecha de entrega estimada: {resultado[5]}")
+
                 if resultado[2] == 'Pendiente':
                     self.ui.lbl_estado.setStyleSheet("color: orange; font-weight: bold; font-size: 14px;")
                 elif resultado[2] == 'Terminado':
                     self.ui.lbl_estado.setStyleSheet("color: green; font-weight: bold; font-size: 14px;")
+                
                     
             else:
-                QMessageBox.warning(self.ui, "No encontrado", "No existe ninguna cita con ese folio. Verifica que tu folio" \
-                "                               sea correcto, y vuelve a intentar.")
-                self.ui.lbl_cliente.setText("")
-                self.ui.lbl_aparato.setText("")
-                self.ui.lbl_estado.setText("")
-                self.ui.lbl_total.setText("")
-                
+                QMessageBox.warning(self.ui, "No encontrado", "No existe ninguna cita con ese folio. Verifica que tu folio sea correcto, y vuelve a intentar.")
+                self.ui.lbl_cliente.setText("Cliente: ")
+                self.ui.lbl_aparato.setText("Aparato: ")
+                self.ui.lbl_estado.setText("Estado: ")
+                self.ui.lbl_total.setText("Total a pagar: ")
+                self.ui.lbl_diagnostico.setText("Diagnóstico: ")
+                self.ui.lbl_fecha_entrega.setText("Fecha de entrega estimada: ")
+
         except Exception as e:
-            QMessageBox.critical(self.ui, "Error", f"Fallo al consultar:\n{e}")
+            QMessageBox.critical(self.ui, "Error", f"Fallo al consultar:\n{e}, contacte con soporte técnico.")
         finally:
             cursor.close()
             conexion.close()
+
+
+    def aprobar_presupuesto(self):
+        
+        if not hasattr(self, 'folio_confirmado') or not self.folio_confirmado:
+            QMessageBox.warning(self.ui, "Alerta", "Primero debes buscar un folio válido.")
+            return
+
+        folio = self.folio_confirmado
+
+        fecha_base = QDate.currentDate().addDays(10)
+        fecha_bd = fecha_base.toString("yyyy-MM-dd")
+        fecha_visual = fecha_base.toString("dd-MM-yyyy")
+
+        conexion = conectar_bd()
+        if not conexion: return
+        try:
+            cursor = conexion.cursor()
+            sql = "UPDATE servicios SET estado = 'En Servicio', fecha_estimada = %s WHERE folio_seguimiento = %s"
+            cursor.execute(sql, (fecha_bd, folio))
+            conexion.commit()
+        
+            QMessageBox.information(self.ui, "Aprobado", f"Presupuesto aprobado exitosamente.\nTu fecha estimada de entrega es: {fecha_visual}")
+        
+            self.buscar_folio() 
+
+            self.ui.btn_aprobar.setEnabled(False)
+            self.ui.btn_rechazar.setEnabled(False)
+        
+        except Exception as e:
+            QMessageBox.critical(self.ui, "Error", f"Ocurrió un error al aprobar: {str(e)}")
+        finally:
+            cursor.close()
+            conexion.close()
+
+
+    def rechazar_presupuesto(self):
+        
+        if not hasattr(self, 'folio_confirmado') or not self.folio_confirmado:
+                    QMessageBox.warning(self.ui, "Alerta", "Primero debes buscar un folio válido.")
+                    return
+        
+        folio = self.folio_confirmado
+    
+        confirmacion = QMessageBox.question(
+            self.ui, 
+            "Confirmar Rechazo", 
+            "¿Estás seguro de que deseas rechazar el presupuesto? El servicio será cancelado.",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            )
+
+        conexion = conectar_bd()
+        if confirmacion == QMessageBox.StandardButton.Yes:
+            try:
+                cursor = conexion.cursor()
+                cursor.execute("SELECT id FROM servicios WHERE folio_seguimiento = %s", (folio,))
+                resultado = cursor.fetchone()
+
+                if not resultado:
+                    return
+
+                id_servicio = resultado[0]
+
+                cursor.execute("SELECT cantidad, id_refaccion FROM detalle_servicio WHERE id_servicio = %s", (id_servicio,))
+                piezas_usadas = cursor.fetchall()
+
+                if piezas_usadas:
+                    sql_devolucion = "UPDATE refacciones SET stock = stock + %s WHERE id = %s"
+                    cursor.executemany(sql_devolucion, piezas_usadas)
+
+                sql = "UPDATE servicios SET estado = 'Cancelado', costo_mano_obra = 0 WHERE id = %s"
+                cursor.execute(sql, (id_servicio,))
+                conexion.commit()
+            
+                QMessageBox.information(self.ui, "Cancelado", "El presupuesto ha sido rechazado exitosamente.")
+        
+                self.buscar_folio() 
+            
+            except Exception as e:
+                conexion.rollback()
+                QMessageBox.critical(self.ui, "Error", f"Ocurrió un error al cancelar: {str(e)}")
+            finally:
+                cursor.close()
+                conexion.close()
 
     def volver_inicio(self):
         self.ventana_inicio = BienvenidaWindow()
@@ -1316,7 +1607,7 @@ class LoginWindow(QMainWindow):
             
         try:
             cursor = conexion.cursor()
-            sql = "SELECT nombre FROM usuarios WHERE usuario = %s AND password = %s"
+            sql = "SELECT nombre_corto FROM usuarios WHERE usuario = %s AND password = %s"
             cursor.execute(sql, (usuario_texto, password_texto))
             resultado = cursor.fetchone() 
 
@@ -1324,6 +1615,7 @@ class LoginWindow(QMainWindow):
                 nombre_admin = resultado[0]
                 QMessageBox.information(self, "Bienvenido", f"¡Hola {nombre_admin}! Has iniciado sesión correctamente.")
                 self.dashboard = DashboardAdmin() 
+                self.dashboard.usuario_actual = usuario_texto
                 self.close()                       
                 
             else:

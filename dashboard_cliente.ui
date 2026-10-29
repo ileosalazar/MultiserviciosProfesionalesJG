@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>412</width>
-    <height>391</height>
+    <width>433</width>
+    <height>525</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -67,6 +67,9 @@
      <height>31</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(181, 255, 187);</string>
+   </property>
    <property name="text">
     <string>Consultar cita</string>
    </property>
@@ -75,10 +78,13 @@
    <property name="geometry">
     <rect>
      <x>180</x>
-     <y>340</y>
+     <y>480</y>
      <width>75</width>
      <height>24</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(222, 222, 222);</string>
    </property>
    <property name="text">
     <string>Volver</string>
@@ -106,6 +112,9 @@
      <height>31</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(170, 255, 255);</string>
+   </property>
    <property name="text">
     <string>Agendar cita</string>
    </property>
@@ -113,53 +122,53 @@
   <widget class="QLabel" name="lbl_cliente">
    <property name="geometry">
     <rect>
-     <x>120</x>
+     <x>90</x>
      <y>210</y>
-     <width>191</width>
+     <width>271</width>
      <height>20</height>
     </rect>
    </property>
    <property name="text">
-    <string>I</string>
+    <string>Cliente:</string>
    </property>
   </widget>
   <widget class="QLabel" name="lbl_aparato">
    <property name="geometry">
     <rect>
-     <x>120</x>
+     <x>90</x>
      <y>240</y>
-     <width>231</width>
+     <width>271</width>
      <height>20</height>
     </rect>
    </property>
    <property name="text">
-    <string>I</string>
+    <string>Aparato:</string>
    </property>
   </widget>
   <widget class="QLabel" name="lbl_estado">
    <property name="geometry">
     <rect>
-     <x>120</x>
+     <x>90</x>
      <y>270</y>
-     <width>191</width>
+     <width>271</width>
      <height>20</height>
     </rect>
    </property>
    <property name="text">
-    <string>I</string>
+    <string>Estado actual: </string>
    </property>
   </widget>
   <widget class="QLabel" name="lbl_total">
    <property name="geometry">
     <rect>
-     <x>120</x>
+     <x>90</x>
      <y>300</y>
-     <width>221</width>
+     <width>271</width>
      <height>20</height>
     </rect>
    </property>
    <property name="text">
-    <string>I</string>
+    <string>Total a pagar:</string>
    </property>
   </widget>
   <widget class="QLabel" name="label">
@@ -179,6 +188,79 @@
    </property>
    <property name="scaledContents">
     <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lbl_diagnostico">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>330</y>
+     <width>271</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Diagnóstico:</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
+   </property>
+   <property name="wordWrap">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btn_aprobar">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>330</x>
+     <y>340</y>
+     <width>75</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(176, 255, 216);</string>
+   </property>
+   <property name="text">
+    <string>Aprobar</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btn_rechazar">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>330</x>
+     <y>390</y>
+     <width>75</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(255, 149, 149);</string>
+   </property>
+   <property name="text">
+    <string>Rechazar</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lbl_fecha_entrega">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>440</y>
+     <width>361</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Fecha estimada de entrega:</string>
    </property>
   </widget>
  </widget>
