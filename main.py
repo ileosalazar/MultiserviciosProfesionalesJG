@@ -1,8 +1,8 @@
 import sys
 import os
-from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QTableWidgetItem, QInputDialog
+from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QTableWidgetItem, QInputDialog, QHeaderView
 from PySide6.QtGui import QIcon, QRegularExpressionValidator, QIntValidator, QDoubleValidator 
-from PySide6.QtCore import QFile, QDate, QRegularExpression
+from PySide6.QtCore import QFile, QDate, QRegularExpression, Qt
 from PySide6.QtUiTools import QUiLoader
 from database import conectar_bd
 import random
@@ -33,7 +33,10 @@ class NuevaCitaWindow:
         self.ui.btn_guardar_cita.clicked.connect(self.guardar_cita)
         
         self.ui.combo_cliente.currentIndexChanged.connect(self.cargar_aparatos)
-        
+
+        self.ui.txt_nuevo_tipo.setMaxLength(30)
+        self.ui.txt_nueva_marca.setMaxLength(25)
+
         self.cargar_clientes()
 
     def cargar_clientes(self):
@@ -198,6 +201,7 @@ class AgregarPiezaWindow:
         self.cargar_inventario_combo()
 
         self.ui.input_cantidad.setValidator(validador_numeros)
+        self.ui.input_cantidad.setMaxLength(5)
         
         self.ui.combo_refaccion.currentIndexChanged.connect(self.actualizar_etiquetas)
         self.ui.btn_guardar_pieza.clicked.connect(self.guardar_pieza)
@@ -309,6 +313,11 @@ class NuevaRefaccionWindow:
         self.ui.input_stock.setValidator(validador_stock)
         self.ui.input_costo.setValidator(validador_dinero)
         self.ui.input_precio.setValidator(validador_dinero)
+
+        self.ui.input_nombre.setMaxLength(50)
+        self.ui.input_stock.setMaxLength(3)
+        self.ui.input_costo.setMaxLength(10)
+        self.ui.input_precio.setMaxLength(10)
         
         self.ui.btn_guardar_refaccion.clicked.connect(self.guardar_refaccion)
 
@@ -386,6 +395,7 @@ class DashboardAdmin:
         self.ui.input_confirmar_pass.setMaxLength(8)
         self.ui.input_nuevo_usuario.setMaxLength(6)
         self.ui.input_nuevo_nombre.setMaxLength(25)
+        self.ui.input_pass_actual.setMaxLength(8)
 
         regex_numeros = QRegularExpression(r"^[0-9]+$")
         validador_numeros = QRegularExpressionValidator(regex_numeros)
@@ -396,6 +406,8 @@ class DashboardAdmin:
         self.ui.btn_agregar_pieza.clicked.connect(self.abrir_agregar_pieza)
         self.ui.btn_eliminar_cita.clicked.connect(self.eliminar_cita)
         self.ui.btn_actualizar_fecha.clicked.connect(self.actualizar_fecha_admin)
+
+        self.ui.input_buscador.textChanged.connect(self.filtrar_tabla_citas)
         self.ui.tabla_citas.itemSelectionChanged.connect(self.mostrar_diagnostico_seleccionado)
 
         self.ui.dt_fecha_admin.setMinimumDate(QDate.currentDate())
@@ -418,6 +430,13 @@ class DashboardAdmin:
 
         self.ui.btn_nuevo_admin.clicked.connect(self.crear_nuevo_admin)
 
+
+        self.ui.tabla_citas.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
+        self.ui.tabla_clientes.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
+        self.ui.tabla_inventario.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
+        self.ui.tabla_proveedores.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
+        
+        
         self.ui.showMaximized()
 
     def cargar_citas(self):
@@ -466,6 +485,7 @@ class DashboardAdmin:
                         texto_celda = str(dato)
         
                     celda = QTableWidgetItem(texto_celda)
+                    celda.setTextAlignment(Qt.AlignCenter)
                     self.ui.tabla_citas.setItem(fila_num, col_num, celda)
 
                     
@@ -518,6 +538,7 @@ class DashboardAdmin:
                         texto_celda = str(dato)
                         
                     celda = QTableWidgetItem(texto_celda)
+                    celda.setTextAlignment(Qt.AlignCenter)
                     self.ui.tabla_clientes.setItem(fila_num, col_num, celda)
             
             self.ui.tabla_clientes.setColumnHidden(0, True)
@@ -629,8 +650,6 @@ class DashboardAdmin:
                     
                     cursor.execute("SELECT cantidad, id_refaccion FROM detalle_servicio WHERE id_servicio = %s", (id_servicio,))
                     piezas_usadas = cursor.fetchall()
-
-                    QMessageBox.information(self.ui, "Diagnóstico", f"Python encontró {len(piezas_usadas)} piezas para devolver de este folio.")
                     
                     if piezas_usadas:
                         for pieza in piezas_usadas:
@@ -803,17 +822,79 @@ class DashboardAdmin:
     
         try:
             cursor = conexion.cursor()
-            cursor.execute("SELECT diagnostico FROM servicios WHERE folio_seguimiento = %s", (folio,))
+
+            sql_info = """
+            SELECT 
+                s.diagnostico, 
+                c.calle, 
+                c.numero, 
+                c.colonia, 
+                c.codigo_postal, 
+                c.municipio 
+            FROM servicios s
+            JOIN aparatos a ON s.id_aparato = a.id
+            JOIN clientes c ON a.id_cliente = c.id
+            WHERE s.folio_seguimiento = %s
+            """
+
+            cursor.execute(sql_info, (folio,))
             resultado = cursor.fetchone()
-        
-            if resultado and resultado[0]:
-                self.ui.txt_diagnostico_admin.setText(resultado[0])
+
+            if resultado:
+                diagnostico = resultado[0] if resultado[0] else "Sin diagnóstico."
+            
+                calle = resultado[1] or ""
+                numero = resultado[2] or ""
+                colonia = resultado[3] or ""
+                cp = resultado[4] or ""
+                municipio = resultado[5] or ""
+            
+                direccion_partes = []
+                if calle or numero: direccion_partes.append(f"{calle} {numero}".strip())
+                if colonia: direccion_partes.append(f"Col. {colonia}")
+                if cp: direccion_partes.append(f"C.P. {cp}")
+                if municipio: direccion_partes.append(municipio)
+            
+                direccion = ", ".join(direccion_partes) if direccion_partes else "Dirección no registrada."
+            
             else:
-                self.ui.txt_diagnostico_admin.setText("Sin diagnóstico registrado aún. Registre un diagnóstico después de agregar refacciones a una cita" \
-                " y cambiar el estado a 'Esperando aprobación del cliente', donde ingresará también el costo de la mano de obra.")
+                diagnostico = "Sin diagnóstico."
+                direccion = "Información no encontrada."
+        
+            sql_piezas = """
+            SELECT d.cantidad, r.nombre 
+            FROM detalle_servicio d
+            JOIN refacciones r ON d.id_refaccion = r.id
+            JOIN servicios s ON d.id_servicio = s.id
+            WHERE s.folio_seguimiento = %s
+            """
+            cursor.execute(sql_piezas, (folio,))
+            piezas = cursor.fetchall()
+        
+            lista_piezas_html = ""
+            if piezas:
+                for cantidad, nombre in piezas:
+                    lista_piezas_html += f"<li>{cantidad}x {nombre}</li>"
+                lista_piezas_html = f"<ul>{lista_piezas_html}</ul>"
+            else:
+                lista_piezas_html = "<p style='color: gray; margin-top: 0px;'>Ninguna refacción asignada.</p>"
+            
+            expediente_html = f"""
+            <h4 style="color: #2c3e50; margin-bottom: 2px;">Dirección del Cliente</h4>
+            <p style="margin-top: 0px;">{direccion}</p>
+            
+            <h4 style="color: #2c3e50; margin-bottom: 2px;">Diagnóstico</h4>
+            <p style="margin-top: 0px;">{diagnostico}</p>
+            
+            <h4 style="color: #2c3e50; margin-bottom: 2px;">Refacciones Cotizadas</h4>
+            {lista_piezas_html}
+            """
+        
+            self.ui.txt_diagnostico_admin.setHtml(expediente_html)
             
         except Exception as e:
-            self.ui.txt_diagnostico_admin.setText(f"Error al cargar: {str(e)}")
+            self.ui.txt_diagnostico_admin.setText(f"Error al cargar expediente: {str(e)}")
+        
 
     def cerrar_sesion(self):
         respuesta = QMessageBox.question(
@@ -863,6 +944,7 @@ class DashboardAdmin:
                         texto_celda = str(dato)
                         
                     celda = QTableWidgetItem(texto_celda)
+                    celda.setTextAlignment(Qt.AlignCenter)
                     self.ui.tabla_inventario.setItem(fila_num, col_num, celda)
 
                 self.ui.tabla_inventario.setColumnHidden(0, True)
@@ -919,6 +1001,7 @@ class DashboardAdmin:
                         texto_celda = str(dato)
 
                     celda = QTableWidgetItem(texto_celda)
+                    celda.setTextAlignment(Qt.AlignCenter)
                     self.ui.tabla_proveedores.setItem(fila_num, col_num, celda)
             self.ui.tabla_proveedores.setColumnHidden(0, True)
                     
@@ -1016,6 +1099,26 @@ class DashboardAdmin:
             else:
                 QMessageBox.critical(self.ui, "Error", f"Ocurrió un error en la base de datos: {str(e)}")
 
+    def filtrar_tabla_citas(self):
+        texto_busqueda = self.ui.input_buscador.text().lower()
+    
+        for fila in range(self.ui.tabla_citas.rowCount()):
+        
+            item_folio = self.ui.tabla_citas.item(fila, 0)
+            item_nombre = self.ui.tabla_citas.item(fila, 1)
+            item_aparato = self.ui.tabla_citas.item(fila, 2)
+        
+            if item_folio and item_nombre and item_aparato:
+                folio = item_folio.text().lower()
+                nombre = item_nombre.text().lower()
+                aparato = item_aparato.text().lower()
+            
+                if texto_busqueda in folio or texto_busqueda in nombre or texto_busqueda in aparato:
+                    self.ui.tabla_citas.setRowHidden(fila, False)
+                else:
+                    self.ui.tabla_citas.setRowHidden(fila, True)
+
+
 
 #Pantalla editar stock o precio desde el admin
 class EditarStockWindow:
@@ -1105,7 +1208,19 @@ class AgendarClienteWindow:
         self.ui.txt_cp.setValidator(validador_numeros)
         self.ui.txt_municipio.setValidator(validador_letras)
 
+        self.ui.input_nombre.setMaxLength(30)
+        self.ui.input_apellidop.setMaxLength(25)
+        self.ui.input_apellidom.setMaxLength(25)
         self.ui.input_telefono.setMaxLength(10)
+
+        self.ui.input_tipo_aparato.setMaxLength(30)
+        self.ui.input_marca.setMaxLength(25)
+
+        self.ui.txt_calle.setMaxLength(50)
+        self.ui.txt_numero.setMaxLength(10)
+        self.ui.txt_colonia.setMaxLength(50)
+        self.ui.txt_cp.setMaxLength(5)
+        self.ui.txt_municipio.setMaxLength(30)
 
         self.ui.setWindowTitle("Agendar Reparación")
         self.ui.btn_confirmar_cita.clicked.connect(self.procesar_agendamiento)
@@ -1203,6 +1318,18 @@ class NuevoClienteWindow:
         self.ui.txt_municipio.setValidator(validador_letras)
 
         self.ui.input_telefono.setMaxLength(10)
+        self.ui.input_nombre.setMaxLength(30)
+        self.ui.input_paterno.setMaxLength(25)
+        self.ui.input_materno.setMaxLength(25)
+        self.ui.input_telefono.setMaxLength(10)
+        
+        
+        self.ui.txt_calle.setMaxLength(50)
+        self.ui.txt_numero.setMaxLength(10)
+        self.ui.txt_colonia.setMaxLength(50)
+        self.ui.txt_cp.setMaxLength(5)
+        self.ui.txt_municipio.setMaxLength(30)
+
         
         self.ui.setWindowTitle("Registrar Cliente Manual")
         self.ui.btn_guardar.clicked.connect(self.guardar_cliente)
@@ -1320,6 +1447,7 @@ class HistorialClienteWindow:
                         texto_celda = str(dato)
                         
                     celda = QTableWidgetItem(texto_celda)
+                    celda.setTextAlignment(Qt.AlignCenter)
                     self.ui.tabla_historial.setItem(fila_num, col_num, celda)
                     
         except Exception as e:
@@ -1343,6 +1471,10 @@ class NuevoProveedorWindow:
 
         self.ui.input_telefono.setValidator(validador_numeros)
         self.ui.input_telefono.setMaxLength(10)
+
+        self.ui.input_empresa.setMaxLength(50)
+        self.ui.input_contacto.setMaxLength(50)
+        self.ui.input_email.setMaxLength(50)
         
         self.ui.btn_guardar_proveedor.clicked.connect(self.guardar_proveedor)
 
@@ -1402,6 +1534,8 @@ class DashboardCliente:
         self.ui.btn_aprobar.clicked.connect(self.aprobar_presupuesto)
         self.ui.btn_rechazar.clicked.connect(self.rechazar_presupuesto)
 
+        self.ui.input_folio.setMaxLength(8)
+
     def buscar_folio(self):
         folio_texto = self.ui.input_folio.text().strip().upper()
         
@@ -1443,7 +1577,7 @@ class DashboardCliente:
                 self.ui.lbl_aparato.setText(f"Aparato: {resultado[1]}")
                 self.ui.lbl_estado.setText(f"Estado Actual: {resultado[2]}")
                 self.ui.lbl_total.setText(f"Total a pagar: ${resultado[3]:.2f}")
-                
+                self.ui.lbl_fecha_entrega.setText(f"Fecha de entrega estimada: ")
 
                 diagnostico_bd = resultado[4]
                 if diagnostico_bd:
@@ -1454,7 +1588,7 @@ class DashboardCliente:
                 if resultado[2] == 'Esperando aprobación del cliente':
                     self.ui.btn_aprobar.setEnabled(True)
                     self.ui.btn_rechazar.setEnabled(True)
-                    self.ui.lbl_fecha_entrega.setText("Fecha de entrega estimada: Esperando a que se apruebe el servicio.")
+                    self.ui.lbl_fecha_entrega.setText("Fecha de entrega estimada: Esperando aprobación del servicio.")
                 else:
                     self.ui.btn_aprobar.setEnabled(False)
                     self.ui.btn_rechazar.setEnabled(False)
@@ -1463,9 +1597,10 @@ class DashboardCliente:
                         self.ui.lbl_fecha_entrega.setText(f"Fecha de entrega estimada: {resultado[5]}")
 
                 if resultado[2] == 'Pendiente':
-                    self.ui.lbl_estado.setStyleSheet("color: orange; font-weight: bold; font-size: 14px;")
+                    self.ui.lbl_estado.setStyleSheet("font-weight: bold; font-size: 12px;")
                 elif resultado[2] == 'Terminado':
-                    self.ui.lbl_estado.setStyleSheet("color: green; font-weight: bold; font-size: 14px;")
+                    self.ui.lbl_estado.setStyleSheet("font-weight: bold; font-size: 12px;")
+                    self.ui.lbl_fecha_entrega.setText(f"Fecha de entrega estimada: {resultado[5]}")
                 
                     
             else:
@@ -1591,6 +1726,9 @@ class LoginWindow(QMainWindow):
 
         self.ui.btn_entrar.clicked.connect(self.verificar_login)
         self.ui.btn_volver.clicked.connect(self.volver_bienvenida)
+
+        self.ui.input_usuario.setMaxLength(6)
+        self.ui.input_password.setMaxLength(8)
 
     def verificar_login(self):
         usuario_texto = self.ui.input_usuario.text()

@@ -79,10 +79,10 @@ background-color: rgb(188, 218, 255);</string>
        <bool>false</bool>
       </attribute>
       <attribute name="horizontalHeaderMinimumSectionSize">
-       <number>161</number>
+       <number>150</number>
       </attribute>
       <attribute name="horizontalHeaderDefaultSectionSize">
-       <number>170</number>
+       <number>165</number>
       </attribute>
       <column>
        <property name="text">
@@ -124,7 +124,7 @@ background-color: rgb(188, 218, 255);</string>
       <property name="geometry">
        <rect>
         <x>190</x>
-        <y>430</y>
+        <y>450</y>
         <width>91</width>
         <height>31</height>
        </rect>
@@ -142,7 +142,7 @@ background-color: rgb(85, 170, 255);</string>
       <property name="geometry">
        <rect>
         <x>330</x>
-        <y>430</y>
+        <y>450</y>
         <width>81</width>
         <height>31</height>
        </rect>
@@ -160,7 +160,7 @@ background-color: rgb(85, 170, 255);</string>
       <property name="geometry">
        <rect>
         <x>600</x>
-        <y>430</y>
+        <y>450</y>
         <width>81</width>
         <height>31</height>
        </rect>
@@ -196,7 +196,7 @@ color: rgb(255, 255, 255);</string>
       <property name="geometry">
        <rect>
         <x>450</x>
-        <y>430</y>
+        <y>450</y>
         <width>111</width>
         <height>31</height>
        </rect>
@@ -214,7 +214,7 @@ background-color: rgb(85, 170, 255);</string>
       <property name="geometry">
        <rect>
         <x>930</x>
-        <y>430</y>
+        <y>450</y>
         <width>121</width>
         <height>31</height>
        </rect>
@@ -224,7 +224,7 @@ background-color: rgb(85, 170, 255);</string>
       <property name="geometry">
        <rect>
         <x>750</x>
-        <y>430</y>
+        <y>450</y>
         <width>171</width>
         <height>31</height>
        </rect>
@@ -244,7 +244,7 @@ background-color: rgb(85, 255, 127);</string>
         <x>50</x>
         <y>340</y>
         <width>1071</width>
-        <height>71</height>
+        <height>101</height>
        </rect>
       </property>
       <property name="sizeAdjustPolicy">
@@ -294,10 +294,10 @@ background-color: rgb(188, 218, 255);
 </string>
       </property>
       <attribute name="horizontalHeaderMinimumSectionSize">
-       <number>32</number>
+       <number>160</number>
       </attribute>
       <attribute name="horizontalHeaderDefaultSectionSize">
-       <number>183</number>
+       <number>190</number>
       </attribute>
       <column>
        <property name="text">
@@ -404,8 +404,11 @@ background-color: rgb(170, 255, 127);</string>
 border-radius: 10px;
 background-color: rgb(188, 218, 255);background-color: rgb(188, 218, 255);</string>
       </property>
+      <attribute name="horizontalHeaderMinimumSectionSize">
+       <number>170</number>
+      </attribute>
       <attribute name="horizontalHeaderDefaultSectionSize">
-       <number>190</number>
+       <number>200</number>
       </attribute>
       <column>
        <property name="text">
@@ -513,10 +516,10 @@ border-radius: 10px;
 background-color: rgb(188, 218, 255);background-color: rgb(188, 218, 255);</string>
       </property>
       <attribute name="horizontalHeaderMinimumSectionSize">
-       <number>100</number>
+       <number>180</number>
       </attribute>
       <attribute name="horizontalHeaderDefaultSectionSize">
-       <number>195</number>
+       <number>210</number>
       </attribute>
       <column>
        <property name="text">
@@ -911,9 +914,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>40</y>
+        <y>20</y>
         <width>1131</width>
-        <height>391</height>
+        <height>441</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -934,15 +937,19 @@ li.checked::marker { content: &quot;\2612&quot;; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Segoe UI'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p align=&quot;justify&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Verdana'; font-size:10pt; font-weight:700;&quot;&gt;Citas Pendientes: &lt;/span&gt;&lt;span style=&quot; font-family:'Verdana'; font-size:10pt;&quot;&gt;Las citas registradas aparecen en la tabla. Para agregar una cita, primero debe registrar al cliente en la pestaña &amp;quot;Clientes&amp;quot;. Una vez registrado, mediante el botón &amp;quot;Nueva Cita&amp;quot; registre el cliente con un aparato nuevo o ya registrado con los datos correspondientes. Al guardar la cita, esta aparecerá en la tabla con el estado &amp;quot;Pendiente&amp;quot;.&lt;/span&gt;&lt;/p&gt;
 &lt;p align=&quot;justify&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Verdana'; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Verdana'; font-size:10pt;&quot;&gt;Seleccione una cita y cambie el estado con el botón &amp;quot;Editar estado&amp;quot; a &amp;quot;En Revisión&amp;quot; para ingresar el costo de la revisión, que por defecto es $300. Agregue refacciones seleccionando una cita y el botón &amp;quot;Agregar refacción&amp;quot;, ingresando la refacción en inventario y la cantidad necesaria. El costo de la revisión y refacciones se agregará automáticamente al precio en la tabla.&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Verdana'; font-size:10pt;&quot;&gt;1.- Seleccione una cita y cambie el estado con el botón &amp;quot;Editar estado&amp;quot; a &amp;quot;En Revisión&amp;quot; para ingresar el costo de la revisión, que por defecto es $300. &lt;/span&gt;&lt;/p&gt;
 &lt;p align=&quot;justify&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Verdana'; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Verdana'; font-size:10pt;&quot;&gt;Al cambiar al estado &amp;quot;Esperando aprobación del cliente&amp;quot;, debe ingresar el diagnóstico del aparato y el costo de la mano de obra. Cuando el cliente apruebe, el estado cambiará a &amp;quot;En servicio&amp;quot;, y por defecto la fecha de entrega se establecerá a diez días después de la aceptación.&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Verdana'; font-size:10pt;&quot;&gt;2.- Agregue refacciones seleccionando una cita y el botón &amp;quot;Agregar refacción&amp;quot;, ingresando la refacción en inventario y la cantidad necesaria. El costo de la revisión y refacciones se agregará automáticamente al precio en la tabla.&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;justify&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Verdana'; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Verdana'; font-size:10pt;&quot;&gt;3.- Al cambiar al estado &amp;quot;Esperando aprobación del cliente&amp;quot;, debe ingresar el diagnóstico del aparato y el costo de la mano de obra. &lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Verdana'; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Verdana'; font-size:10pt;&quot;&gt;Si necesita más o menos tiempo, seleccione la cita, ingrese otra fecha en el espacio correspondiente en la parte inferior derecha de la tabla y haga clic en &amp;quot;Actualizar fecha de entrega&amp;quot;. Al terminar el servicio, actualice la cita a &amp;quot;Terminado&amp;quot; para terminar el registro y el ciclo de vida de la cita. La cita permanecerá en el registro.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Verdana'; font-size:10pt;&quot;&gt;4.- Cuando el cliente apruebe, el estado cambiará a &amp;quot;En servicio&amp;quot;, y por defecto la fecha de entrega se establecerá a diez días después de la aceptación. Si necesita más o menos tiempo, seleccione la cita, ingrese otra fecha en el espacio correspondiente en la parte inferior derecha de la tabla y haga clic en &amp;quot;Actualizar fecha de entrega&amp;quot;. &lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Verdana'; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Verdana'; font-size:10pt;&quot;&gt;Para cancelar una cita, selecciónela en la tabla y cambie el estado a &amp;quot;Cancelado&amp;quot;. No se preocupe si ya agregó una refacción, ya que al cancelarse se regresarán las refacciones asignadas a esa cita al inventario. Si el cliente no aprueba la reparación desde su dashboard, el estado de la cita cambiará automáticamente a &amp;quot;Cancelado&amp;quot;, pero el precio de la revisión se mantendrá.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Verdana'; font-size:10pt;&quot;&gt;5.- Al terminar el servicio, actualice la cita a &amp;quot;Terminado&amp;quot; para terminar el registro y el ciclo de vida de la cita. La cita permanecerá en el registro.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Verdana'; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Verdana'; font-size:10pt;&quot;&gt;Por último, para eliminar una cita debe cancelarla primero, debido a que si elimina una a medio proceso puede perder los datos de las refacciones ya asignadas. Cancele una cita, selecciónela y haga clic en &amp;quot;Eliminar cita&amp;quot; para borrarla de la tabla y la base de datos. Esta es una acción PERMANENTE, así que verifique antes de realizarla.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Verdana'; font-size:10pt;&quot;&gt;6.- Para cancelar una cita, selecciónela en la tabla y cambie el estado a &amp;quot;Cancelado&amp;quot;. No se preocupe si ya agregó una refacción, ya que al cancelarse se regresarán las refacciones asignadas a esa cita al inventario. Si el cliente no aprueba la reparación desde su dashboard, el estado de la cita cambiará automáticamente a &amp;quot;Cancelado&amp;quot;, pero el precio de la revisión se mantendrá.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Verdana'; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Verdana'; font-size:10pt;&quot;&gt;7.- Por último, para eliminar una cita debe cancelarla primero, debido a que si elimina una a medio proceso puede perder los datos de las refacciones ya asignadas. Cancele una cita, selecciónela y haga clic en &amp;quot;Eliminar cita&amp;quot; para borrarla de la tabla y la base de datos. Esta es una acción PERMANENTE, así que verifique antes de realizarla.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Verdana'; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Verdana'; font-size:10pt;&quot;&gt;Los clientes tienen la responsabilidad de guardar el folio de su cita; si lo pierden, pueden contactarse con usted para que les proporcione de nuevo el folio. Tenga cuidado de con quién comparte esta información.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
@@ -1122,6 +1129,22 @@ color: rgb(255, 255, 255);</string>
     </property>
     <property name="scaledContents">
      <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="input_buscador">
+    <property name="geometry">
+     <rect>
+      <x>1000</x>
+      <y>100</y>
+      <width>211</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignmentFlag::AlignCenter</set>
+    </property>
+    <property name="placeholderText">
+     <string>Buscar por folio, nombre o aparato</string>
     </property>
    </widget>
   </widget>
