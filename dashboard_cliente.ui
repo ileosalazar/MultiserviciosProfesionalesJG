@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Consulta de cita</string>
   </property>
   <property name="styleSheet">
    <string notr="true">background-color: rgb(255, 253, 221);</string>
@@ -19,11 +19,14 @@
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>150</x>
+     <x>140</x>
      <y>30</y>
-     <width>221</width>
+     <width>271</width>
      <height>16</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 9pt &quot;Verdana&quot;;</string>
    </property>
    <property name="text">
     <string>Ingresa el folio de tu cita para consultarla.</string>
@@ -38,6 +41,9 @@
      <height>16</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">font: 9pt &quot;Verdana&quot;;</string>
+   </property>
    <property name="text">
     <string>Folio</string>
    </property>
@@ -50,6 +56,9 @@
      <width>113</width>
      <height>22</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true"/>
    </property>
    <property name="alignment">
     <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -68,7 +77,9 @@
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(181, 255, 187);</string>
+    <string notr="true">background-color: rgb(181, 255, 187);
+border: 2px solid green;
+border-radius: 10px;</string>
    </property>
    <property name="text">
     <string>Consultar cita</string>
@@ -79,12 +90,14 @@
     <rect>
      <x>180</x>
      <y>480</y>
-     <width>75</width>
-     <height>24</height>
+     <width>81</width>
+     <height>31</height>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(222, 222, 222);</string>
+    <string notr="true">border: 2px solid gray;
+border-radius: 10px;
+background-color: rgb(222, 222, 222);</string>
    </property>
    <property name="text">
     <string>Volver</string>
@@ -93,11 +106,14 @@
   <widget class="QLabel" name="label_4">
    <property name="geometry">
     <rect>
-     <x>150</x>
+     <x>140</x>
      <y>70</y>
-     <width>151</width>
-     <height>16</height>
+     <width>171</width>
+     <height>20</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 9pt &quot;Verdana&quot;;</string>
    </property>
    <property name="text">
     <string>¿No cuentas con una cita?</string>
@@ -106,14 +122,17 @@
   <widget class="QPushButton" name="btn_agendar_nueva">
    <property name="geometry">
     <rect>
-     <x>300</x>
-     <y>60</y>
-     <width>81</width>
+     <x>320</x>
+     <y>70</y>
+     <width>91</width>
      <height>31</height>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(170, 255, 255);</string>
+    <string notr="true">background-color: rgb(85, 255, 255);
+font: italic 9pt &quot;Segoe UI&quot;;
+border: 2px solid blue;
+border-radius: 10px;</string>
    </property>
    <property name="text">
     <string>Agendar cita</string>
@@ -128,6 +147,9 @@
      <height>20</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">font: 8pt &quot;Verdana&quot;;</string>
+   </property>
    <property name="text">
     <string>Cliente:</string>
    </property>
@@ -140,6 +162,9 @@
      <width>271</width>
      <height>20</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 8pt &quot;Verdana&quot;;</string>
    </property>
    <property name="text">
     <string>Aparato:</string>
@@ -154,6 +179,9 @@
      <height>20</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">font: 8pt &quot;Verdana&quot;;</string>
+   </property>
    <property name="text">
     <string>Estado actual: </string>
    </property>
@@ -167,6 +195,9 @@
      <height>20</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">font: 8pt &quot;Verdana&quot;;</string>
+   </property>
    <property name="text">
     <string>Total a pagar:</string>
    </property>
@@ -174,10 +205,10 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>30</x>
+     <x>20</x>
      <y>20</y>
-     <width>101</width>
-     <height>81</height>
+     <width>111</width>
+     <height>91</height>
     </rect>
    </property>
    <property name="text">
@@ -198,6 +229,9 @@
      <width>271</width>
      <height>91</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 8pt &quot;Verdana&quot;;</string>
    </property>
    <property name="text">
     <string>Diagnóstico:</string>
@@ -222,7 +256,9 @@
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(176, 255, 216);</string>
+    <string notr="true">border: 2px solid green;
+border-radius: 10px;
+background-color: rgb(176, 255, 216);</string>
    </property>
    <property name="text">
     <string>Aprobar</string>
@@ -241,7 +277,9 @@
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(255, 149, 149);</string>
+    <string notr="true">border: 2px solid red;
+border-radius: 10px;
+background-color: rgb(255, 149, 149);</string>
    </property>
    <property name="text">
     <string>Rechazar</string>
@@ -258,6 +296,9 @@
      <width>361</width>
      <height>20</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 8pt &quot;Verdana&quot;;</string>
    </property>
    <property name="text">
     <string>Fecha estimada de entrega:</string>

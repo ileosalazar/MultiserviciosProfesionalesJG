@@ -6,21 +6,28 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>477</width>
+    <height>318</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Editar stock y costos de refacción</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(253, 255, 215);</string>
   </property>
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>20</x>
+     <x>10</x>
      <y>20</y>
-     <width>371</width>
+     <width>461</width>
      <height>16</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 9pt &quot;Verdana&quot;;
+font: 700 9pt &quot;Verdana&quot;;</string>
    </property>
    <property name="text">
     <string>Modifica el stock, costo de compra y precio público de una refacción. </string>
@@ -29,11 +36,14 @@
   <widget class="QLabel" name="lbl_nombre_pieza">
    <property name="geometry">
     <rect>
-     <x>140</x>
-     <y>60</y>
-     <width>151</width>
+     <x>150</x>
+     <y>50</y>
+     <width>181</width>
      <height>20</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 9pt &quot;Verdana&quot;;</string>
    </property>
    <property name="text">
     <string>Editando: Bomba de agua</string>
@@ -42,41 +52,62 @@
   <widget class="QLineEdit" name="input_sumar_stock">
    <property name="geometry">
     <rect>
-     <x>220</x>
+     <x>250</x>
      <y>100</y>
-     <width>113</width>
+     <width>151</width>
      <height>22</height>
     </rect>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignCenter</set>
+   </property>
+   <property name="placeholderText">
+    <string>Num. de piezas a agregar</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="input_nuevo_costo">
    <property name="geometry">
     <rect>
-     <x>220</x>
+     <x>250</x>
      <y>150</y>
-     <width>113</width>
+     <width>151</width>
      <height>22</height>
     </rect>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignCenter</set>
+   </property>
+   <property name="placeholderText">
+    <string>Nuevo costo</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="input_nuevo_precio">
    <property name="geometry">
     <rect>
-     <x>220</x>
+     <x>250</x>
      <y>200</y>
-     <width>113</width>
+     <width>151</width>
      <height>22</height>
     </rect>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignCenter</set>
+   </property>
+   <property name="placeholderText">
+    <string>Nuevo precio</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>60</x>
+     <x>50</x>
      <y>100</y>
-     <width>141</width>
+     <width>191</width>
      <height>16</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 9pt &quot;Verdana&quot;;</string>
    </property>
    <property name="text">
     <string>Cantidad de nuevas piezas:</string>
@@ -87,9 +118,12 @@
     <rect>
      <x>70</x>
      <y>200</y>
-     <width>141</width>
+     <width>151</width>
      <height>16</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 9pt &quot;Verdana&quot;;</string>
    </property>
    <property name="text">
     <string>Nuevo precio al público:</string>
@@ -100,9 +134,12 @@
     <rect>
      <x>70</x>
      <y>150</y>
-     <width>141</width>
+     <width>161</width>
      <height>16</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 9pt &quot;Verdana&quot;;</string>
    </property>
    <property name="text">
     <string>Nuevo costo de compra:</string>
@@ -111,11 +148,16 @@
   <widget class="QPushButton" name="btn_actualizar_stock">
    <property name="geometry">
     <rect>
-     <x>140</x>
+     <x>160</x>
      <y>250</y>
      <width>141</width>
      <height>31</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">border: 2px solid blue;
+border-radius: 12px;
+background-color: rgb(85, 255, 255);</string>
    </property>
    <property name="text">
     <string>Actualizar inventario</string>

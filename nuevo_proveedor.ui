@@ -13,57 +13,87 @@
   <property name="windowTitle">
    <string>Ingresar Nuevo Proveedor</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(252, 255, 220);</string>
+  </property>
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>100</x>
+     <x>70</x>
      <y>20</y>
-     <width>211</width>
-     <height>16</height>
+     <width>291</width>
+     <height>21</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">font: 700 10pt &quot;Verdana&quot;;</string>
+   </property>
    <property name="text">
-    <string>Ingresa los datos del nuevo proveedor:</string>
+    <string>Ingrese los datos del nuevo proveedor:</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="input_empresa">
    <property name="geometry">
     <rect>
-     <x>200</x>
+     <x>162</x>
      <y>70</y>
-     <width>113</width>
+     <width>171</width>
      <height>22</height>
     </rect>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignCenter</set>
+   </property>
+   <property name="placeholderText">
+    <string>Nombre obligatorio</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="input_contacto">
    <property name="geometry">
     <rect>
-     <x>200</x>
+     <x>162</x>
      <y>120</y>
-     <width>113</width>
+     <width>171</width>
      <height>22</height>
     </rect>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignCenter</set>
+   </property>
+   <property name="placeholderText">
+    <string>Persona, página web, sucursal</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="input_telefono">
    <property name="geometry">
     <rect>
-     <x>200</x>
+     <x>162</x>
      <y>170</y>
-     <width>113</width>
+     <width>171</width>
      <height>22</height>
     </rect>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignCenter</set>
+   </property>
+   <property name="placeholderText">
+    <string>8123456789</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="input_email">
    <property name="geometry">
     <rect>
-     <x>200</x>
+     <x>162</x>
      <y>220</y>
-     <width>113</width>
+     <width>171</width>
      <height>22</height>
     </rect>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignCenter</set>
+   </property>
+   <property name="placeholderText">
+    <string>correo@dominio.com</string>
    </property>
   </widget>
   <widget class="QPushButton" name="btn_guardar_proveedor">
@@ -75,6 +105,11 @@
      <height>31</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">border: 2px solid green;
+border-radius: 12px;
+background-color: rgb(85, 255, 127);</string>
+   </property>
    <property name="text">
     <string>Guardar proveedor</string>
    </property>
@@ -82,11 +117,14 @@
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>110</x>
+     <x>88</x>
      <y>70</y>
-     <width>49</width>
-     <height>16</height>
+     <width>71</width>
+     <height>20</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 9pt &quot;Verdana&quot;;</string>
    </property>
    <property name="text">
     <string>Empresa:</string>
@@ -95,11 +133,14 @@
   <widget class="QLabel" name="label_3">
    <property name="geometry">
     <rect>
-     <x>110</x>
+     <x>90</x>
      <y>120</y>
      <width>61</width>
-     <height>16</height>
+     <height>20</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 9pt &quot;Verdana&quot;;</string>
    </property>
    <property name="text">
     <string>Contacto:</string>
@@ -108,11 +149,14 @@
   <widget class="QLabel" name="label_4">
    <property name="geometry">
     <rect>
-     <x>110</x>
+     <x>90</x>
      <y>170</y>
-     <width>51</width>
-     <height>16</height>
+     <width>71</width>
+     <height>20</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 9pt &quot;Verdana&quot;;</string>
    </property>
    <property name="text">
     <string>Teléfono:</string>
@@ -121,11 +165,14 @@
   <widget class="QLabel" name="label_5">
    <property name="geometry">
     <rect>
-     <x>110</x>
+     <x>98</x>
      <y>220</y>
-     <width>49</width>
-     <height>16</height>
+     <width>61</width>
+     <height>20</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 9pt &quot;Verdana&quot;;</string>
    </property>
    <property name="text">
     <string>Email:</string>

@@ -33,7 +33,8 @@
      </size>
     </property>
     <property name="styleSheet">
-     <string notr="true">background-color: rgb(251, 255, 202);</string>
+     <string notr="true">
+background-color: rgb(85, 170, 255);background-color: rgb(251, 255, 202);</string>
     </property>
     <property name="tabPosition">
      <enum>QTabWidget::TabPosition::North</enum>
@@ -44,11 +45,17 @@
     <property name="currentIndex">
      <number>0</number>
     </property>
-    <property name="iconSize">
-     <size>
-      <width>16</width>
-      <height>16</height>
-     </size>
+    <property name="elideMode">
+     <enum>Qt::TextElideMode::ElideNone</enum>
+    </property>
+    <property name="tabsClosable">
+     <bool>false</bool>
+    </property>
+    <property name="movable">
+     <bool>false</bool>
+    </property>
+    <property name="tabBarAutoHide">
+     <bool>false</bool>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -64,16 +71,18 @@
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(188, 218, 255);</string>
+       <string notr="true">border: 1px solid blue;
+border-radius: 10px;
+background-color: rgb(188, 218, 255);</string>
       </property>
       <attribute name="horizontalHeaderCascadingSectionResizes">
        <bool>false</bool>
       </attribute>
       <attribute name="horizontalHeaderMinimumSectionSize">
-       <number>150</number>
+       <number>161</number>
       </attribute>
       <attribute name="horizontalHeaderDefaultSectionSize">
-       <number>160</number>
+       <number>170</number>
       </attribute>
       <column>
        <property name="text">
@@ -114,14 +123,16 @@
      <widget class="QPushButton" name="btn_nueva_cita">
       <property name="geometry">
        <rect>
-        <x>200</x>
+        <x>190</x>
         <y>430</y>
         <width>91</width>
         <height>31</height>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(212, 212, 158);</string>
+       <string notr="true">border: 2px solid blue;
+border-radius: 12px;
+background-color: rgb(85, 170, 255);</string>
       </property>
       <property name="text">
        <string>Nueva Cita</string>
@@ -130,14 +141,16 @@
      <widget class="QPushButton" name="btn_editar_estado">
       <property name="geometry">
        <rect>
-        <x>320</x>
+        <x>330</x>
         <y>430</y>
         <width>81</width>
         <height>31</height>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(212, 212, 158);</string>
+       <string notr="true">border: 2px solid blue;
+border-radius: 12px;
+background-color: rgb(85, 170, 255);</string>
       </property>
       <property name="text">
        <string>Editar Estado</string>
@@ -146,7 +159,7 @@
      <widget class="QPushButton" name="btn_eliminar_cita">
       <property name="geometry">
        <rect>
-        <x>570</x>
+        <x>600</x>
         <y>430</y>
         <width>81</width>
         <height>31</height>
@@ -163,9 +176,9 @@ color: rgb(255, 255, 255);</string>
      <widget class="QLabel" name="label_3">
       <property name="geometry">
        <rect>
-        <x>160</x>
+        <x>50</x>
         <y>10</y>
-        <width>661</width>
+        <width>1111</width>
         <height>16</height>
        </rect>
       </property>
@@ -176,20 +189,22 @@ color: rgb(255, 255, 255);</string>
        </font>
       </property>
       <property name="text">
-       <string>Agrega nuevas citas, modifícalas, edita su estado y elimínalas en este apartado según se requiera.</string>
+       <string>Agregue nuevas citas, modifíquelas, edite su estado y elimínelas en este apartado según se requiera. Agregue refacciones y diagnósticos a cada cita según necesite.</string>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_agregar_pieza">
       <property name="geometry">
        <rect>
-        <x>430</x>
+        <x>450</x>
         <y>430</y>
         <width>111</width>
         <height>31</height>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(212, 212, 158);</string>
+       <string notr="true">border: 2px solid blue;
+border-radius: 12px;
+background-color: rgb(85, 170, 255);</string>
       </property>
       <property name="text">
        <string>Agregar Refacción</string>
@@ -198,7 +213,7 @@ color: rgb(255, 255, 255);</string>
      <widget class="QDateEdit" name="dt_fecha_admin">
       <property name="geometry">
        <rect>
-        <x>690</x>
+        <x>930</x>
         <y>430</y>
         <width>121</width>
         <height>31</height>
@@ -208,11 +223,16 @@ color: rgb(255, 255, 255);</string>
      <widget class="QPushButton" name="btn_actualizar_fecha">
       <property name="geometry">
        <rect>
-        <x>840</x>
+        <x>750</x>
         <y>430</y>
         <width>171</width>
         <height>31</height>
        </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border: 2px solid green;
+border-radius: 12px;
+background-color: rgb(85, 255, 127);</string>
       </property>
       <property name="text">
        <string>Actualizar Fecha de entrega</string>
@@ -227,6 +247,15 @@ color: rgb(255, 255, 255);</string>
         <height>71</height>
        </rect>
       </property>
+      <property name="sizeAdjustPolicy">
+       <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents</enum>
+      </property>
+      <property name="tabChangesFocus">
+       <bool>false</bool>
+      </property>
+      <property name="lineWrapMode">
+       <enum>QTextEdit::LineWrapMode::WidgetWidth</enum>
+      </property>
       <property name="readOnly">
        <bool>true</bool>
       </property>
@@ -239,6 +268,9 @@ li.unchecked::marker { content: &quot;\2610&quot;; }
 li.checked::marker { content: &quot;\2612&quot;; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Segoe UI'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p align=&quot;justify&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="placeholderText">
+       <string>Seleccione una cita de la tabla para leer su diagnóstico aquí. Para ingresar el diagnóstico de una cita, cambie el estado de la misma a &quot;Esperando aprobación del cliente&quot; con el botón correspondiente.</string>
       </property>
      </widget>
     </widget>
@@ -256,13 +288,16 @@ li.checked::marker { content: &quot;\2612&quot;; }
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(188, 218, 255);</string>
+       <string notr="true">border: 1px solid blue;
+border-radius: 10px;
+background-color: rgb(188, 218, 255);
+</string>
       </property>
       <attribute name="horizontalHeaderMinimumSectionSize">
        <number>32</number>
       </attribute>
       <attribute name="horizontalHeaderDefaultSectionSize">
-       <number>180</number>
+       <number>183</number>
       </attribute>
       <column>
        <property name="text">
@@ -298,14 +333,16 @@ li.checked::marker { content: &quot;\2612&quot;; }
      <widget class="QPushButton" name="btn_nueva_refaccion">
       <property name="geometry">
        <rect>
-        <x>390</x>
+        <x>340</x>
         <y>410</y>
         <width>161</width>
         <height>41</height>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(212, 212, 158);</string>
+       <string notr="true">border: 2px solid green;
+border-radius: 12px;
+background-color: rgb(170, 255, 127);</string>
       </property>
       <property name="text">
        <string>Agregar refacción</string>
@@ -314,14 +351,16 @@ li.checked::marker { content: &quot;\2612&quot;; }
      <widget class="QPushButton" name="btn_editar_stock">
       <property name="geometry">
        <rect>
-        <x>610</x>
+        <x>570</x>
         <y>410</y>
         <width>311</width>
         <height>41</height>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(212, 212, 158);</string>
+       <string notr="true">border: 2px solid green;
+border-radius: 12px;
+background-color: rgb(170, 255, 127);</string>
       </property>
       <property name="text">
        <string>Surtir Stock y/o cambiar precio público y de compra</string>
@@ -330,9 +369,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
      <widget class="QLabel" name="label_4">
       <property name="geometry">
        <rect>
-        <x>200</x>
+        <x>20</x>
         <y>10</y>
-        <width>661</width>
+        <width>1141</width>
         <height>16</height>
        </rect>
       </property>
@@ -343,7 +382,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
        </font>
       </property>
       <property name="text">
-       <string>Controla el inventario de refacciones, modifica stock y precios desde este apartado.</string>
+       <string>Controla el inventario de refacciones, modifica stock y precios desde este apartado. Registra el proveedor antes de agregar una refacción si no fue registrado previamente.</string>
       </property>
      </widget>
     </widget>
@@ -357,11 +396,13 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <x>20</x>
         <y>40</y>
         <width>1151</width>
-        <height>351</height>
+        <height>381</height>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(188, 218, 255);</string>
+       <string notr="true">border: 1px solid blue;
+border-radius: 10px;
+background-color: rgb(188, 218, 255);background-color: rgb(188, 218, 255);</string>
       </property>
       <attribute name="horizontalHeaderDefaultSectionSize">
        <number>190</number>
@@ -401,13 +442,15 @@ li.checked::marker { content: &quot;\2612&quot;; }
       <property name="geometry">
        <rect>
         <x>350</x>
-        <y>410</y>
+        <y>440</y>
         <width>201</width>
         <height>31</height>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(212, 212, 158);</string>
+       <string notr="true">border: 2px solid violet;
+border-radius: 12px;
+background-color: rgb(255, 170, 255);</string>
       </property>
       <property name="text">
        <string>Registrar Cliente Manualmente</string>
@@ -417,13 +460,15 @@ li.checked::marker { content: &quot;\2612&quot;; }
       <property name="geometry">
        <rect>
         <x>600</x>
-        <y>410</y>
+        <y>440</y>
         <width>171</width>
         <height>31</height>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(212, 212, 158);</string>
+       <string notr="true">border: 2px solid violet;
+border-radius: 12px;
+background-color: rgb(255, 170, 255);</string>
       </property>
       <property name="text">
        <string>Ver Historial del Cliente</string>
@@ -432,9 +477,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
      <widget class="QLabel" name="label_5">
       <property name="geometry">
        <rect>
-        <x>200</x>
+        <x>50</x>
         <y>10</y>
-        <width>711</width>
+        <width>1081</width>
         <height>16</height>
        </rect>
       </property>
@@ -445,7 +490,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
        </font>
       </property>
       <property name="text">
-       <string>Visualiza y registra clientes nuevos, además de consultar el historial de cada cliente desde esta sección.</string>
+       <string>Visualice y registre clientes nuevos, además de consultar el historial de cada cliente desde esta sección. Registre un nuevo cliente antes de generarle una cita.</string>
       </property>
      </widget>
     </widget>
@@ -457,14 +502,19 @@ li.checked::marker { content: &quot;\2612&quot;; }
       <property name="geometry">
        <rect>
         <x>110</x>
-        <y>50</y>
+        <y>90</y>
         <width>981</width>
-        <height>351</height>
+        <height>311</height>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(188, 218, 255);</string>
+       <string notr="true">border: 1px solid blue;
+border-radius: 10px;
+background-color: rgb(188, 218, 255);background-color: rgb(188, 218, 255);</string>
       </property>
+      <attribute name="horizontalHeaderMinimumSectionSize">
+       <number>100</number>
+      </attribute>
       <attribute name="horizontalHeaderDefaultSectionSize">
        <number>195</number>
       </attribute>
@@ -504,7 +554,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(212, 212, 158);</string>
+       <string notr="true">border: 2px solid violet;
+border-radius: 12px;
+background-color: rgb(255, 170, 0);</string>
       </property>
       <property name="text">
        <string>Nuevo Proveedor</string>
@@ -530,9 +582,9 @@ color: rgb(255, 255, 255);</string>
      <widget class="QLabel" name="label_7">
       <property name="geometry">
        <rect>
-        <x>360</x>
+        <x>10</x>
         <y>20</y>
-        <width>711</width>
+        <width>1161</width>
         <height>16</height>
        </rect>
       </property>
@@ -543,7 +595,26 @@ color: rgb(255, 255, 255);</string>
        </font>
       </property>
       <property name="text">
-       <string>Consulta y agrega proveedores de refacciones desde esta sección.</string>
+       <string>Consulte y agregue proveedores de refacciones desde esta sección. Puede agregar proveedores sin todos los datos, pero el nombre de la empresa o proveedor es obligatorio.</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_18">
+      <property name="geometry">
+       <rect>
+        <x>230</x>
+        <y>50</y>
+        <width>721</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Verdana</family>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>No se preocupe al eliminar proveedores; las refacciones asignadas al mismo no se eliminarán del inventario.</string>
       </property>
      </widget>
     </widget>
@@ -564,7 +635,7 @@ color: rgb(255, 255, 255);</string>
        <string notr="true">font: 11pt &quot;Verdana&quot;;</string>
       </property>
       <property name="text">
-       <string>En esta sección podrá añadir un administrador para iniciar sesión en este dashoard. Asegúrese de estar seguro antes de añadir una nueva cuenta.</string>
+       <string>En esta sección podrá añadir un administrador para iniciar sesión en este dashboard. Asegúrese de estar seguro antes de añadir una nueva cuenta.</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_9">
@@ -699,7 +770,9 @@ color: rgb(255, 255, 255);</string>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(189, 255, 161);</string>
+       <string notr="true">border: 2px solid green;
+border-radius: 12px;
+background-color: rgb(85, 255, 127);</string>
       </property>
       <property name="text">
        <string>Agregar nuevo usuario</string>
@@ -791,11 +864,13 @@ color: rgb(255, 255, 255);</string>
         <x>900</x>
         <y>220</y>
         <width>231</width>
-        <height>101</height>
+        <height>81</height>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 228, 121);</string>
+       <string notr="true">border: 2px;
+border-radius: 12px;
+background-color: rgb(255, 228, 121);</string>
       </property>
       <property name="readOnly">
        <bool>true</bool>
@@ -808,8 +883,7 @@ hr { height: 1px; border-width: 0; }
 li.unchecked::marker { content: &quot;\2610&quot;; }
 li.checked::marker { content: &quot;\2612&quot;; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Segoe UI'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Verdana'; font-size:11pt;&quot;&gt;Último aviso: agregue el nuevo usuario sólo si está seguro, y recuerde el usuario y contraseña.&lt;/span&gt;&lt;/p&gt;
-&lt;p align=&quot;justify&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Verdana'; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Verdana'; font-size:11pt;&quot;&gt;Último aviso: agregue el nuevo usuario sólo si está seguro, y recuerde el usuario y contraseña.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_17">
@@ -829,13 +903,155 @@ li.checked::marker { content: &quot;\2612&quot;; }
       </property>
      </widget>
     </widget>
+    <widget class="QWidget" name="tab_6">
+     <attribute name="title">
+      <string>Instrucciones de uso: Citas</string>
+     </attribute>
+     <widget class="QTextEdit" name="textEdit_2">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>40</y>
+        <width>1131</width>
+        <height>391</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border: 2px;
+border-radius: 12px;
+background-color: rgb(255, 228, 121);</string>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+      <property name="html">
+       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;meta charset=&quot;utf-8&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+hr { height: 1px; border-width: 0; }
+li.unchecked::marker { content: &quot;\2610&quot;; }
+li.checked::marker { content: &quot;\2612&quot;; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Segoe UI'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Verdana'; font-size:10pt; font-weight:700;&quot;&gt;Citas Pendientes: &lt;/span&gt;&lt;span style=&quot; font-family:'Verdana'; font-size:10pt;&quot;&gt;Las citas registradas aparecen en la tabla. Para agregar una cita, primero debe registrar al cliente en la pestaña &amp;quot;Clientes&amp;quot;. Una vez registrado, mediante el botón &amp;quot;Nueva Cita&amp;quot; registre el cliente con un aparato nuevo o ya registrado con los datos correspondientes. Al guardar la cita, esta aparecerá en la tabla con el estado &amp;quot;Pendiente&amp;quot;.&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;justify&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Verdana'; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Verdana'; font-size:10pt;&quot;&gt;Seleccione una cita y cambie el estado con el botón &amp;quot;Editar estado&amp;quot; a &amp;quot;En Revisión&amp;quot; para ingresar el costo de la revisión, que por defecto es $300. Agregue refacciones seleccionando una cita y el botón &amp;quot;Agregar refacción&amp;quot;, ingresando la refacción en inventario y la cantidad necesaria. El costo de la revisión y refacciones se agregará automáticamente al precio en la tabla.&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;justify&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Verdana'; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Verdana'; font-size:10pt;&quot;&gt;Al cambiar al estado &amp;quot;Esperando aprobación del cliente&amp;quot;, debe ingresar el diagnóstico del aparato y el costo de la mano de obra. Cuando el cliente apruebe, el estado cambiará a &amp;quot;En servicio&amp;quot;, y por defecto la fecha de entrega se establecerá a diez días después de la aceptación.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Verdana'; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Verdana'; font-size:10pt;&quot;&gt;Si necesita más o menos tiempo, seleccione la cita, ingrese otra fecha en el espacio correspondiente en la parte inferior derecha de la tabla y haga clic en &amp;quot;Actualizar fecha de entrega&amp;quot;. Al terminar el servicio, actualice la cita a &amp;quot;Terminado&amp;quot; para terminar el registro y el ciclo de vida de la cita. La cita permanecerá en el registro.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Verdana'; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Verdana'; font-size:10pt;&quot;&gt;Para cancelar una cita, selecciónela en la tabla y cambie el estado a &amp;quot;Cancelado&amp;quot;. No se preocupe si ya agregó una refacción, ya que al cancelarse se regresarán las refacciones asignadas a esa cita al inventario. Si el cliente no aprueba la reparación desde su dashboard, el estado de la cita cambiará automáticamente a &amp;quot;Cancelado&amp;quot;, pero el precio de la revisión se mantendrá.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Verdana'; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Verdana'; font-size:10pt;&quot;&gt;Por último, para eliminar una cita debe cancelarla primero, debido a que si elimina una a medio proceso puede perder los datos de las refacciones ya asignadas. Cancele una cita, selecciónela y haga clic en &amp;quot;Eliminar cita&amp;quot; para borrarla de la tabla y la base de datos. Esta es una acción PERMANENTE, así que verifique antes de realizarla.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Verdana'; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Verdana'; font-size:10pt;&quot;&gt;Los clientes tienen la responsabilidad de guardar el folio de su cita; si lo pierden, pueden contactarse con usted para que les proporcione de nuevo el folio. Tenga cuidado de con quién comparte esta información.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab_7">
+     <attribute name="title">
+      <string>Instrucciones de uso: Otros</string>
+     </attribute>
+     <widget class="QTextEdit" name="textEdit_3">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>30</y>
+        <width>1131</width>
+        <height>131</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border: 2px;
+border-radius: 12px;
+background-color: rgb(170, 255, 127);</string>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+      <property name="html">
+       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;meta charset=&quot;utf-8&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+hr { height: 1px; border-width: 0; }
+li.unchecked::marker { content: &quot;\2610&quot;; }
+li.checked::marker { content: &quot;\2612&quot;; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Segoe UI'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:700;&quot;&gt;Inventario: &lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;En esta pestaña puede consultar las refacciones en inventario, tanto su stock como su precio al público y el margen de ganancia con respecto al costo de compra al proveedor, y de cuál proveedor es cada refacción. Puede agregar una nueva refacción con el botón &amp;quot;Agregar refacción&amp;quot;, ingresando el nombre, stock, precio de compra y precio de venta, así como el proveedor de manera opcional.&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;justify&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Si necesita modificar esa información de alguna refacción ya registrada, selecciónela y haga clic en &amp;quot;Surtir stock y/o cambiar precio público y de compra&amp;quot;. Ingrese la cantidad de nuevas piezas (no el nuevo stock; el sistema sumará el número que usted ingrese con el stock ya registrado), y modifique los precios de compra y venta si es necesario. Estos nuevos precios no afectarán a las refacciones que ya fueron vendidas a citas en servicio o terminadas.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+     <widget class="QTextEdit" name="textEdit_4">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>180</y>
+        <width>1131</width>
+        <height>101</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border: 2px;
+border-radius: 12px;
+background-color: rgb(85, 255, 255);</string>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+      <property name="html">
+       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;meta charset=&quot;utf-8&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+hr { height: 1px; border-width: 0; }
+li.unchecked::marker { content: &quot;\2610&quot;; }
+li.checked::marker { content: &quot;\2612&quot;; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Segoe UI'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:700;&quot;&gt;Clientes: &lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Puede consultar la información de clientes que ya hayan tenido una cita o hayan sido registrados aunque no hayan realizado una reparación o revisión. Puede consultar su nombre, dirección, número de aparatos registrados, la última visita y su teléfono de contacto. Para agregar un cliente, haga clic en &amp;quot;Registrar cliente manualmente&amp;quot; y registre los datos personales y de domicilio correspondientes. No necesita registrar un aparato; eso puede hacerse desde &amp;quot;Citas pendientes&amp;quot;.&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;justify&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Puede consultar el historial de visitas al hacer clic en un cliente y presionar &amp;quot;Ver Historial del Cliente&amp;quot;. Podrá visualizar cada cita, su folio, aparato, fecha y total pagado.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+     <widget class="QTextEdit" name="textEdit_5">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>300</y>
+        <width>1131</width>
+        <height>161</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border: 2px;
+border-radius: 12px;
+background-color: rgb(255, 170, 255);</string>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+      <property name="html">
+       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;meta charset=&quot;utf-8&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+hr { height: 1px; border-width: 0; }
+li.unchecked::marker { content: &quot;\2610&quot;; }
+li.checked::marker { content: &quot;\2612&quot;; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Segoe UI'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:700;&quot;&gt;Proveedores: &lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Visualice y registre proveedores desde la pestaña correspondiente. Consulte el nombre, contacto, teléfono y/o correo de cada proveedor, y agregue uno nuevo mediante el botón &amp;quot;Nuevo proveedor&amp;quot;. &lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;justify&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Para agregar un proveedor se necesita obligatoriamente el nombre de la empresa o el proveedor como tal. El resto de datos son opcionales, debido a que la naturaleza de un proveedor puede no incluir un teléfono o un correo. El apartado &amp;quot;Contacto&amp;quot; no se refiere a un número teléfonico, sino a cómo se contacta al proveedor, ya sea una persona, sucursal, página web, etc. Si va a incluir un correo, asegúrese de que sea válido.&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;justify&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Por último, puede eliminar un proveedor seleccionándolo en la tabla y haciendo clic en &amp;quot;Eliminar proveedor&amp;quot;. No se preocupe por las refacciones de ese proveedor; permanecerán en el inventario aunque no tengan un proveedor asignado.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+    </widget>
    </widget>
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
       <x>180</x>
       <y>20</y>
-      <width>741</width>
+      <width>1011</width>
       <height>41</height>
      </rect>
     </property>
@@ -843,18 +1059,23 @@ li.checked::marker { content: &quot;\2612&quot;; }
      <font>
       <family>Verdana</family>
       <pointsize>12</pointsize>
+      <italic>false</italic>
+      <bold>true</bold>
      </font>
     </property>
+    <property name="styleSheet">
+     <string notr="true">font: 700 12pt &quot;Verdana&quot;;</string>
+    </property>
     <property name="text">
-     <string>¡Bienvenido al Dashboard de Administrador! Aquí tienes acceso total a la base de datos. </string>
+     <string>¡Bienvenido al Dashboard de Administrador! Aquí tiene acceso total a las citas, inventario, clientes y proveedores. </string>
     </property>
    </widget>
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>390</x>
+      <x>200</x>
       <y>70</y>
-      <width>381</width>
+      <width>1001</width>
       <height>16</height>
      </rect>
     </property>
@@ -864,14 +1085,14 @@ li.checked::marker { content: &quot;\2612&quot;; }
      </font>
     </property>
     <property name="text">
-     <string>Asegúrate de verificar cualquier cambio antes de realizarlo.</string>
+     <string>Asegúrese de verificar cualquier cambio antes de realizarlo. Si necesita ayuda sobre el funcionamiento del sistema, visite las pestañas &quot;Instrucciones de uso&quot;. </string>
     </property>
    </widget>
    <widget class="QPushButton" name="btn_salir">
     <property name="geometry">
      <rect>
-      <x>980</x>
-      <y>50</y>
+      <x>1210</x>
+      <y>30</y>
       <width>75</width>
       <height>24</height>
      </rect>
@@ -903,16 +1124,6 @@ color: rgb(255, 255, 255);</string>
      <bool>true</bool>
     </property>
    </widget>
-  </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>1329</width>
-     <height>22</height>
-    </rect>
-   </property>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>

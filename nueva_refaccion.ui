@@ -13,14 +13,20 @@
   <property name="windowTitle">
    <string>Ingresar Nueva Refacción</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(255, 255, 229);</string>
+  </property>
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>90</x>
+     <x>50</x>
      <y>0</y>
-     <width>221</width>
+     <width>291</width>
      <height>51</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 700 10pt &quot;Verdana&quot;;</string>
    </property>
    <property name="text">
     <string>Ingresa los datos de la nueva refacción:</string>
@@ -29,31 +35,49 @@
   <widget class="QLineEdit" name="input_nombre">
    <property name="geometry">
     <rect>
-     <x>170</x>
+     <x>140</x>
      <y>100</y>
-     <width>111</width>
+     <width>181</width>
      <height>22</height>
     </rect>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignCenter</set>
+   </property>
+   <property name="placeholderText">
+    <string>Nombre de la refacción</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="input_costo">
    <property name="geometry">
     <rect>
-     <x>170</x>
+     <x>140</x>
      <y>180</y>
-     <width>111</width>
+     <width>171</width>
      <height>22</height>
     </rect>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignCenter</set>
+   </property>
+   <property name="placeholderText">
+    <string>Costo de compra al proveedor</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="input_precio">
    <property name="geometry">
     <rect>
-     <x>170</x>
+     <x>140</x>
      <y>220</y>
-     <width>113</width>
+     <width>171</width>
      <height>22</height>
     </rect>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignCenter</set>
+   </property>
+   <property name="placeholderText">
+    <string>Costo de venta al público</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="input_stock">
@@ -65,15 +89,24 @@
      <height>22</height>
     </rect>
    </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignCenter</set>
+   </property>
+   <property name="placeholderText">
+    <string>1, 5, máx. 99</string>
+   </property>
   </widget>
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>100</x>
+     <x>70</x>
      <y>100</y>
      <width>49</width>
      <height>16</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 9pt &quot;Verdana&quot;;</string>
    </property>
    <property name="text">
     <string>Nombre</string>
@@ -88,6 +121,9 @@
      <height>16</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">font: 9pt &quot;Verdana&quot;;</string>
+   </property>
    <property name="text">
     <string>Stock</string>
    </property>
@@ -95,11 +131,14 @@
   <widget class="QLabel" name="label_4">
    <property name="geometry">
     <rect>
-     <x>100</x>
+     <x>80</x>
      <y>220</y>
      <width>49</width>
      <height>16</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 9pt &quot;Verdana&quot;;</string>
    </property>
    <property name="text">
     <string>Precio</string>
@@ -108,11 +147,14 @@
   <widget class="QLabel" name="label_5">
    <property name="geometry">
     <rect>
-     <x>100</x>
+     <x>80</x>
      <y>180</y>
      <width>49</width>
      <height>16</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 9pt &quot;Verdana&quot;;</string>
    </property>
    <property name="text">
     <string>Costo</string>
@@ -127,6 +169,11 @@
      <height>31</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">border: 2px solid green;
+border-radius: 12px;
+background-color: rgb(85, 255, 127);</string>
+   </property>
    <property name="text">
     <string>Guardar en Inventario</string>
    </property>
@@ -134,14 +181,17 @@
   <widget class="QLabel" name="label_6">
    <property name="geometry">
     <rect>
-     <x>40</x>
+     <x>20</x>
      <y>60</y>
-     <width>121</width>
-     <height>16</height>
+     <width>141</width>
+     <height>20</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">font: 9pt &quot;Verdana&quot;;</string>
+   </property>
    <property name="text">
-    <string>Proveedor (Opcional)</string>
+    <string>Proveedor (Opcional):</string>
    </property>
   </widget>
   <widget class="QComboBox" name="combo_proveedor">
@@ -152,6 +202,9 @@
      <width>181</width>
      <height>22</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(235, 235, 235);</string>
    </property>
   </widget>
  </widget>

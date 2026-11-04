@@ -11,19 +11,25 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Historial del cliente</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(254, 255, 217);</string>
   </property>
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>180</x>
+     <x>140</x>
      <y>10</y>
-     <width>341</width>
+     <width>481</width>
      <height>51</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">font: 700 10pt &quot;Verdana&quot;;</string>
+   </property>
    <property name="text">
-    <string>Visualiza el historial de servicios y/o reparaciones de un cliente.</string>
+    <string>Visualice el historial de servicios y/o reparaciones de un cliente.</string>
    </property>
   </widget>
   <widget class="QLabel" name="lbl_nombre_historial">
@@ -34,6 +40,9 @@
      <width>201</width>
      <height>16</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 9pt &quot;Verdana&quot;;</string>
    </property>
    <property name="text">
     <string>Nombre del cliente: </string>
@@ -47,6 +56,9 @@
      <width>211</width>
      <height>16</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 9pt &quot;Verdana&quot;;</string>
    </property>
    <property name="text">
     <string>Teléfono del cliente: </string>
@@ -98,6 +110,11 @@
      <width>91</width>
      <height>31</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">border: 2px solid violet;
+border-radius: 12px;
+background-color: rgb(255, 170, 255);</string>
    </property>
    <property name="text">
     <string>Cerrar ventana</string>

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>433</width>
-    <height>286</height>
+    <width>436</width>
+    <height>259</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,17 +19,22 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>20</y>
+     <x>20</x>
+     <y>0</y>
      <width>411</width>
      <height>71</height>
     </rect>
    </property>
    <property name="font">
     <font>
-     <family>Segoe MDL2 Assets</family>
-     <pointsize>15</pointsize>
+     <family>Verdana</family>
+     <pointsize>12</pointsize>
+     <italic>false</italic>
+     <bold>true</bold>
     </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 700 12pt &quot;Verdana&quot;;</string>
    </property>
    <property name="text">
     <string>¡Bienvenido a Multiservicios Profesionales JG!</string>
@@ -39,7 +44,7 @@
    <property name="geometry">
     <rect>
      <x>190</x>
-     <y>180</y>
+     <y>170</y>
      <width>221</width>
      <height>51</height>
     </rect>
@@ -50,7 +55,10 @@
     </font>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(255, 255, 127);</string>
+    <string notr="true">background-color: rgb(255, 255, 0);
+border: 2px solid orange;
+border-radius: 15px;
+</string>
    </property>
    <property name="text">
     <string>Ingresar como Administrador</string>
@@ -60,7 +68,7 @@
    <property name="geometry">
     <rect>
      <x>190</x>
-     <y>110</y>
+     <y>100</y>
      <width>221</width>
      <height>51</height>
     </rect>
@@ -71,7 +79,9 @@
     </font>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(183, 255, 255);</string>
+    <string notr="true">background-color: rgb(0, 170, 255);
+border: 2px solid blue;
+border-radius: 15px;</string>
    </property>
    <property name="text">
     <string>Ingresar como Cliente</string>
@@ -81,9 +91,9 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>110</y>
-     <width>151</width>
-     <height>121</height>
+     <y>100</y>
+     <width>161</width>
+     <height>131</height>
     </rect>
    </property>
    <property name="text">
@@ -94,6 +104,30 @@
    </property>
    <property name="scaledContents">
     <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>50</y>
+     <width>271</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Verdana</family>
+     <pointsize>10</pointsize>
+     <italic>false</italic>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 10pt &quot;Verdana&quot;;</string>
+   </property>
+   <property name="text">
+    <string>Ingresa al sistema eligiendo un perfil.</string>
    </property>
   </widget>
  </widget>

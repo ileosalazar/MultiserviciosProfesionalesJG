@@ -14,16 +14,19 @@
    <string>Registrar Cliente Manualmente</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: rgb(242, 253, 255);</string>
+   <string notr="true">background-color: rgb(251, 255, 215);</string>
   </property>
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>110</x>
+     <x>50</x>
      <y>30</y>
-     <width>201</width>
+     <width>261</width>
      <height>21</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 700 10pt &quot;Verdana&quot;;</string>
    </property>
    <property name="text">
     <string>Ingrese los datos del nuevo cliente:</string>
@@ -32,11 +35,14 @@
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>100</x>
+     <x>90</x>
      <y>80</y>
-     <width>61</width>
-     <height>16</height>
+     <width>71</width>
+     <height>20</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 9pt &quot;Verdana&quot;;</string>
    </property>
    <property name="text">
     <string>Nombre(s)</string>
@@ -45,11 +51,14 @@
   <widget class="QLabel" name="label_3">
    <property name="geometry">
     <rect>
-     <x>70</x>
+     <x>50</x>
      <y>120</y>
-     <width>91</width>
-     <height>16</height>
+     <width>111</width>
+     <height>20</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 9pt &quot;Verdana&quot;;</string>
    </property>
    <property name="text">
     <string>Apellido paterno</string>
@@ -58,11 +67,14 @@
   <widget class="QLabel" name="label_4">
    <property name="geometry">
     <rect>
-     <x>70</x>
+     <x>50</x>
      <y>160</y>
-     <width>91</width>
-     <height>16</height>
+     <width>111</width>
+     <height>20</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 9pt &quot;Verdana&quot;;</string>
    </property>
    <property name="text">
     <string>Apellido materno</string>
@@ -71,11 +83,14 @@
   <widget class="QLabel" name="label_5">
    <property name="geometry">
     <rect>
-     <x>110</x>
+     <x>100</x>
      <y>200</y>
-     <width>61</width>
-     <height>16</height>
+     <width>71</width>
+     <height>20</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 9pt &quot;Verdana&quot;;</string>
    </property>
    <property name="text">
     <string>Teléfono</string>
@@ -90,6 +105,12 @@
      <height>22</height>
     </rect>
    </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignCenter</set>
+   </property>
+   <property name="placeholderText">
+    <string>Nombre</string>
+   </property>
   </widget>
   <widget class="QLineEdit" name="input_paterno">
    <property name="geometry">
@@ -99,6 +120,12 @@
      <width>141</width>
      <height>22</height>
     </rect>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignCenter</set>
+   </property>
+   <property name="placeholderText">
+    <string>Apellido paterno</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="input_materno">
@@ -110,6 +137,12 @@
      <height>22</height>
     </rect>
    </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignCenter</set>
+   </property>
+   <property name="placeholderText">
+    <string>Apellido materno</string>
+   </property>
   </widget>
   <widget class="QLineEdit" name="input_telefono">
    <property name="geometry">
@@ -119,6 +152,12 @@
      <width>141</width>
      <height>22</height>
     </rect>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignCenter</set>
+   </property>
+   <property name="placeholderText">
+    <string>8123456789</string>
    </property>
   </widget>
   <widget class="QPushButton" name="btn_guardar">
@@ -131,7 +170,9 @@
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(130, 255, 172);</string>
+    <string notr="true">border: 2px solid green;
+border-radius: 12px;
+background-color: rgb(85, 255, 127);</string>
    </property>
    <property name="text">
     <string>Guardar Nuevo Cliente</string>
@@ -147,7 +188,8 @@
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(255, 218, 143);</string>
+    <string notr="true">font: 9pt &quot;Verdana&quot;;
+background-color: rgb(255, 218, 143);</string>
    </property>
    <property name="title">
     <string>Datos del Domicilio</string>
@@ -197,7 +239,7 @@
       <x>30</x>
       <y>140</y>
       <width>91</width>
-      <height>16</height>
+      <height>21</height>
      </rect>
     </property>
     <property name="text">
@@ -210,7 +252,7 @@
       <x>30</x>
       <y>180</y>
       <width>61</width>
-      <height>16</height>
+      <height>20</height>
      </rect>
     </property>
     <property name="text">
@@ -222,19 +264,37 @@
      <rect>
       <x>80</x>
       <y>30</y>
-      <width>141</width>
+      <width>181</width>
       <height>22</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font: 9pt &quot;Segoe UI&quot;;</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignmentFlag::AlignCenter</set>
+    </property>
+    <property name="placeholderText">
+     <string>Nombre de la calle</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="txt_numero">
     <property name="geometry">
      <rect>
-      <x>90</x>
+      <x>100</x>
       <y>60</y>
-      <width>81</width>
+      <width>111</width>
       <height>22</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font: 9pt &quot;Segoe UI&quot;;</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignmentFlag::AlignCenter</set>
+    </property>
+    <property name="placeholderText">
+     <string>123, 45-C, A-2</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="txt_colonia">
@@ -242,19 +302,37 @@
      <rect>
       <x>90</x>
       <y>100</y>
-      <width>141</width>
+      <width>171</width>
       <height>22</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font: 9pt &quot;Segoe UI&quot;;</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignmentFlag::AlignCenter</set>
+    </property>
+    <property name="placeholderText">
+     <string>Nombre de la colonia</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="txt_cp">
     <property name="geometry">
      <rect>
-      <x>120</x>
+      <x>130</x>
       <y>140</y>
       <width>91</width>
       <height>22</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font: 9pt &quot;Segoe UI&quot;;</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignmentFlag::AlignCenter</set>
+    </property>
+    <property name="placeholderText">
+     <string>12345</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="txt_municipio">
@@ -262,9 +340,18 @@
      <rect>
       <x>100</x>
       <y>180</y>
-      <width>141</width>
+      <width>161</width>
       <height>22</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font: 9pt &quot;Segoe UI&quot;;</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignmentFlag::AlignCenter</set>
+    </property>
+    <property name="placeholderText">
+     <string>Nombre del municipio</string>
     </property>
    </widget>
   </widget>

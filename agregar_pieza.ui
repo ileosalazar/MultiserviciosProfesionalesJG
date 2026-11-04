@@ -6,34 +6,43 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>278</height>
+    <width>464</width>
+    <height>301</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Agregar refacción a cita</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(251, 255, 219);</string>
   </property>
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>110</x>
+     <x>120</x>
      <y>30</y>
-     <width>191</width>
+     <width>251</width>
      <height>16</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">font: 700 9pt &quot;Verdana&quot;;</string>
+   </property>
    <property name="text">
-    <string>Ingresa la pieza de refacción nueva.</string>
+    <string>Ingrese la pieza de refacción a la cita.</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>90</x>
-     <y>70</y>
+     <x>110</x>
+     <y>100</y>
      <width>49</width>
      <height>16</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 9pt &quot;Verdana&quot;;</string>
    </property>
    <property name="text">
     <string>Pieza</string>
@@ -42,11 +51,14 @@
   <widget class="QLabel" name="label_3">
    <property name="geometry">
     <rect>
-     <x>90</x>
-     <y>150</y>
-     <width>49</width>
+     <x>140</x>
+     <y>180</y>
+     <width>61</width>
      <height>16</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 9pt &quot;Verdana&quot;;</string>
    </property>
    <property name="text">
     <string>Cantidad</string>
@@ -55,11 +67,14 @@
   <widget class="QLabel" name="lbl_stock_actual">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>110</y>
+     <x>60</x>
+     <y>140</y>
      <width>171</width>
      <height>16</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 9pt &quot;Verdana&quot;;</string>
    </property>
    <property name="text">
     <string>Stock Disponible: --</string>
@@ -68,21 +83,29 @@
   <widget class="QLineEdit" name="input_cantidad">
    <property name="geometry">
     <rect>
-     <x>180</x>
-     <y>150</y>
+     <x>210</x>
+     <y>180</y>
      <width>113</width>
      <height>22</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(231, 231, 231);</string>
    </property>
   </widget>
   <widget class="QPushButton" name="btn_guardar_pieza">
    <property name="geometry">
     <rect>
-     <x>140</x>
-     <y>200</y>
+     <x>180</x>
+     <y>240</y>
      <width>121</width>
      <height>31</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">border: 2px solid green;
+border-radius: 12px;
+background-color: rgb(85, 255, 127);</string>
    </property>
    <property name="text">
     <string>Guardar en Cuenta</string>
@@ -91,24 +114,46 @@
   <widget class="QComboBox" name="combo_refaccion">
    <property name="geometry">
     <rect>
-     <x>150</x>
-     <y>70</y>
-     <width>181</width>
+     <x>170</x>
+     <y>100</y>
+     <width>211</width>
      <height>22</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(231, 231, 231);</string>
    </property>
   </widget>
   <widget class="QLabel" name="lbl_precio_sugerido">
    <property name="geometry">
     <rect>
-     <x>250</x>
-     <y>110</y>
+     <x>280</x>
+     <y>140</y>
      <width>141</width>
      <height>16</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">font: 9pt &quot;Verdana&quot;;</string>
+   </property>
    <property name="text">
     <string>Precio Unitario: $0.00</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_4">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>60</y>
+     <width>441</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 8pt &quot;Verdana&quot;;</string>
+   </property>
+   <property name="text">
+    <string>Seleccione la refacción del inventario e ingrese la cantidad a añadir a la cita.</string>
    </property>
   </widget>
  </widget>
