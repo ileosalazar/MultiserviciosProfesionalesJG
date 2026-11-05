@@ -409,6 +409,8 @@ class DashboardAdmin:
 
         self.ui.input_buscador.textChanged.connect(self.filtrar_tabla_citas)
         self.ui.tabla_citas.itemSelectionChanged.connect(self.mostrar_diagnostico_seleccionado)
+        self.ui.input_buscador_clientes.textChanged.connect(self.filtrar_tabla_clientes)
+        self.ui.input_buscador_inventario.textChanged.connect(self.filtrar_tabla_inventario)
 
         self.ui.dt_fecha_admin.setMinimumDate(QDate.currentDate())
 
@@ -1118,6 +1120,33 @@ class DashboardAdmin:
                 else:
                     self.ui.tabla_citas.setRowHidden(fila, True)
 
+    def filtrar_tabla_clientes(self):
+        texto_busqueda = self.ui.input_buscador_clientes.text().lower()
+    
+        for fila in range(self.ui.tabla_clientes.rowCount()):
+            coincidencia = False
+            for col in range(self.ui.tabla_clientes.columnCount()):
+                item = self.ui.tabla_clientes.item(fila, col)
+                if item and texto_busqueda in item.text().lower():
+                    coincidencia = True
+                    break 
+                
+            self.ui.tabla_clientes.setRowHidden(fila, not coincidencia)
+
+
+    def filtrar_tabla_inventario(self):
+        texto_busqueda = self.ui.input_buscador_inventario.text().lower()
+    
+        for fila in range(self.ui.tabla_inventario.rowCount()):
+            coincidencia = False
+            for col in range(self.ui.tabla_inventario.columnCount()):
+                item = self.ui.tabla_inventario.item(fila, col)
+                if item and texto_busqueda in item.text().lower():
+                    coincidencia = True
+                    break
+                
+            self.ui.tabla_inventario.setRowHidden(fila, not coincidencia)
+
 
 
 #Pantalla editar stock o precio desde el admin
@@ -1483,6 +1512,11 @@ class NuevoProveedorWindow:
         contacto = self.ui.input_contacto.text().strip()
         telefono = self.ui.input_telefono.text().strip()
         email = self.ui.input_email.text().strip()
+
+        if email:
+            if "@" not in email or "." not in email:
+                QMessageBox.warning(self.ui, "Error", "Ingresa un correo electrónico válido.")
+                return
 
         if not empresa:
             QMessageBox.warning(self.ui, "Error", "El nombre de la empresa es obligatorio.")

@@ -176,7 +176,7 @@ color: rgb(255, 255, 255);</string>
      <widget class="QLabel" name="label_3">
       <property name="geometry">
        <rect>
-        <x>50</x>
+        <x>10</x>
         <y>10</y>
         <width>1111</width>
         <height>16</height>
@@ -189,7 +189,7 @@ color: rgb(255, 255, 255);</string>
        </font>
       </property>
       <property name="text">
-       <string>Agregue nuevas citas, modifíquelas, edite su estado y elimínelas en este apartado según se requiera. Agregue refacciones y diagnósticos a cada cita según necesite.</string>
+       <string>Agregue, elimine y modifique citas en este apartado. Agregue refacciones y diagnósticos a cada cita según necesite.</string>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_agregar_pieza">
@@ -271,6 +271,22 @@ li.checked::marker { content: &quot;\2612&quot;; }
       </property>
       <property name="placeholderText">
        <string>Seleccione una cita de la tabla para leer su diagnóstico aquí. Para ingresar el diagnóstico de una cita, cambie el estado de la misma a &quot;Esperando aprobación del cliente&quot; con el botón correspondiente.</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="input_buscador">
+      <property name="geometry">
+       <rect>
+        <x>910</x>
+        <y>10</y>
+        <width>211</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignmentFlag::AlignCenter</set>
+      </property>
+      <property name="placeholderText">
+       <string>Buscar por folio, nombre o aparato</string>
       </property>
      </widget>
     </widget>
@@ -382,7 +398,23 @@ background-color: rgb(170, 255, 127);</string>
        </font>
       </property>
       <property name="text">
-       <string>Controla el inventario de refacciones, modifica stock y precios desde este apartado. Registra el proveedor antes de agregar una refacción si no fue registrado previamente.</string>
+       <string>Controla el inventario de refacciones desde este apartado y modifica sus datos según necesite.</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="input_buscador_inventario">
+      <property name="geometry">
+       <rect>
+        <x>830</x>
+        <y>10</y>
+        <width>221</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignmentFlag::AlignCenter</set>
+      </property>
+      <property name="placeholderText">
+       <string>Buscar por nombre de refacción</string>
       </property>
      </widget>
     </widget>
@@ -480,7 +512,7 @@ background-color: rgb(255, 170, 255);</string>
      <widget class="QLabel" name="label_5">
       <property name="geometry">
        <rect>
-        <x>50</x>
+        <x>20</x>
         <y>10</y>
         <width>1081</width>
         <height>16</height>
@@ -493,7 +525,23 @@ background-color: rgb(255, 170, 255);</string>
        </font>
       </property>
       <property name="text">
-       <string>Visualice y registre clientes nuevos, además de consultar el historial de cada cliente desde esta sección. Registre un nuevo cliente antes de generarle una cita.</string>
+       <string>Visualice y registre clientes, además de consultar el historial de cada uno. Registre un nuevo cliente antes de generarle una cita.</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="input_buscador_clientes">
+      <property name="geometry">
+       <rect>
+        <x>910</x>
+        <y>10</y>
+        <width>221</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignmentFlag::AlignCenter</set>
+      </property>
+      <property name="placeholderText">
+       <string>Buscar por nombre de cliente</string>
       </property>
      </widget>
     </widget>
@@ -1129,22 +1177,6 @@ color: rgb(255, 255, 255);</string>
     </property>
     <property name="scaledContents">
      <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="input_buscador">
-    <property name="geometry">
-     <rect>
-      <x>1000</x>
-      <y>100</y>
-      <width>211</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignmentFlag::AlignCenter</set>
-    </property>
-    <property name="placeholderText">
-     <string>Buscar por folio, nombre o aparato</string>
     </property>
    </widget>
   </widget>
