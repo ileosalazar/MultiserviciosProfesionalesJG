@@ -75,6 +75,9 @@ background-color: rgb(85, 170, 255);background-color: rgb(251, 255, 202);</strin
 border-radius: 10px;
 background-color: rgb(188, 218, 255);</string>
       </property>
+      <property name="editTriggers">
+       <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+      </property>
       <attribute name="horizontalHeaderCascadingSectionResizes">
        <bool>false</bool>
       </attribute>
@@ -309,6 +312,9 @@ border-radius: 10px;
 background-color: rgb(188, 218, 255);
 </string>
       </property>
+      <property name="editTriggers">
+       <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+      </property>
       <attribute name="horizontalHeaderMinimumSectionSize">
        <number>160</number>
       </attribute>
@@ -436,6 +442,9 @@ background-color: rgb(170, 255, 127);</string>
 border-radius: 10px;
 background-color: rgb(188, 218, 255);background-color: rgb(188, 218, 255);</string>
       </property>
+      <property name="editTriggers">
+       <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+      </property>
       <attribute name="horizontalHeaderMinimumSectionSize">
        <number>170</number>
       </attribute>
@@ -464,7 +473,7 @@ background-color: rgb(188, 218, 255);background-color: rgb(188, 218, 255);</stri
       </column>
       <column>
        <property name="text">
-        <string>Total de Aparatos</string>
+        <string>Total de Citas</string>
        </property>
       </column>
       <column>
@@ -562,6 +571,9 @@ background-color: rgb(255, 170, 255);</string>
        <string notr="true">border: 1px solid blue;
 border-radius: 10px;
 background-color: rgb(188, 218, 255);background-color: rgb(188, 218, 255);</string>
+      </property>
+      <property name="editTriggers">
+       <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
       </property>
       <attribute name="horizontalHeaderMinimumSectionSize">
        <number>180</number>
@@ -749,6 +761,9 @@ color: rgb(255, 255, 255);</string>
       <property name="text">
        <string/>
       </property>
+      <property name="alignment">
+       <set>Qt::AlignmentFlag::AlignCenter</set>
+      </property>
      </widget>
      <widget class="QLineEdit" name="input_nuevo_nombre">
       <property name="geometry">
@@ -761,6 +776,9 @@ color: rgb(255, 255, 255);</string>
       </property>
       <property name="text">
        <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignmentFlag::AlignCenter</set>
       </property>
      </widget>
      <widget class="QLineEdit" name="input_nueva_pass">
@@ -778,6 +796,9 @@ color: rgb(255, 255, 255);</string>
       <property name="echoMode">
        <enum>QLineEdit::EchoMode::Password</enum>
       </property>
+      <property name="alignment">
+       <set>Qt::AlignmentFlag::AlignCenter</set>
+      </property>
      </widget>
      <widget class="QLineEdit" name="input_confirmar_pass">
       <property name="geometry">
@@ -794,6 +815,9 @@ color: rgb(255, 255, 255);</string>
       <property name="echoMode">
        <enum>QLineEdit::EchoMode::Password</enum>
       </property>
+      <property name="alignment">
+       <set>Qt::AlignmentFlag::AlignCenter</set>
+      </property>
      </widget>
      <widget class="QLineEdit" name="input_pass_actual">
       <property name="geometry">
@@ -809,6 +833,9 @@ color: rgb(255, 255, 255);</string>
       </property>
       <property name="echoMode">
        <enum>QLineEdit::EchoMode::Password</enum>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignmentFlag::AlignCenter</set>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_nuevo_admin">

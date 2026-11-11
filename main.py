@@ -5,6 +5,7 @@ from PySide6.QtGui import QIcon, QRegularExpressionValidator, QIntValidator, QDo
 from PySide6.QtCore import QFile, QDate, QRegularExpression, Qt
 from PySide6.QtUiTools import QUiLoader
 from database import conectar_bd
+from datetime import date, timedelta
 import random
 import string
 
@@ -17,7 +18,7 @@ def ruta_recurso(ruta_relativa):
     return os.path.join(ruta_base, ruta_relativa)
 
 
-#Pantalla agendar cita desde el administrador
+#Pantalla agendar cita desde admin
 class NuevaCitaWindow:
     def __init__(self, parent=None): 
         self.parent = parent
@@ -515,7 +516,7 @@ class DashboardAdmin:
                     NULLIF(c.codigo_postal, ''), 
                     NULLIF(c.municipio, '')
                 ) AS direccion_completa,                
-                COUNT(DISTINCT a.id) AS total_aparatos,
+                COUNT(s.id) AS total_citas,
                 MAX(s.fecha_visita) AS ultima_visita
             FROM clientes c
             LEFT JOIN aparatos a ON c.id = a.id_cliente
@@ -634,6 +635,16 @@ class DashboardAdmin:
                     return
             else:
                 return
+
+        elif nuevo_estado == "En servicio":
+            fecha_calculada = date.today() + timedelta(days=10)
+            
+            sql_update = """
+                UPDATE servicios 
+                SET estado = %s, fecha_estimada = %s 
+                WHERE folio_seguimiento = %s
+            """
+            cursor.execute(sql_update, (nuevo_estado, fecha_calculada, folio))
 
         elif nuevo_estado == "Cancelado":
             confirmacion = QMessageBox.question(
@@ -1148,7 +1159,6 @@ class DashboardAdmin:
             self.ui.tabla_inventario.setRowHidden(fila, not coincidencia)
 
 
-
 #Pantalla editar stock o precio desde el admin
 class EditarStockWindow:
     def __init__(self, parent=None, id_pieza=0, nombre="", costo=0.0, precio=0.0):
@@ -1449,15 +1459,17 @@ class HistorialClienteWindow:
                 a.tipo || ' ' || a.marca AS aparato,
                 s.fecha_visita,
                 s.estado,
-                (COALESCE(s.costo_revision, 0) + COALESCE(s.costo_mano_obra, 0) + COALESCE(SUM(d.cantidad * d.precio_unitario), 0)) AS total_pagado
+                CASE 
+                    WHEN s.estado = 'Cancelado' THEN COALESCE(s.costo_revision, 0)
+                    ELSE (COALESCE(s.costo_revision, 0) + COALESCE(s.costo_mano_obra, 0) + COALESCE(SUM(d.cantidad * d.precio_unitario), 0))
+                END AS total_pagado
             FROM servicios s
             JOIN aparatos a ON s.id_aparato = a.id
-            -- Corregimos el alias a "d" para que coincida con la suma matemática
             LEFT JOIN detalle_servicio d ON s.id = d.id_servicio
             WHERE a.id_cliente = %s
             GROUP BY 
                 s.id, s.folio_seguimiento, a.tipo, a.marca,
-                s.fecha_visita, s.estado, s.costo_revision, s.costo_mano_obra -- Agregamos el costo de mano de obra aquí
+                s.fecha_visita, s.estado, s.costo_revision, s.costo_mano_obra
             ORDER BY s.fecha_visita DESC
         """
             cursor.execute(sql, (self.id_cliente,))
@@ -1569,6 +1581,14 @@ class DashboardCliente:
         self.ui.btn_rechazar.clicked.connect(self.rechazar_presupuesto)
 
         self.ui.input_folio.setMaxLength(8)
+
+
+        try:
+            conexion = conectar_bd()
+            conexion.cursor()
+        except:
+            QMessageBox.critical(self.ui, "Error de Conexión", f"No se pudo conectar a la base de datos: Verifica tu conexión o contacta a soporte técnico.")
+            sys.exit(app.exec())
 
     def buscar_folio(self):
         folio_texto = self.ui.input_folio.text().strip().upper()
@@ -1763,6 +1783,15 @@ class LoginWindow(QMainWindow):
 
         self.ui.input_usuario.setMaxLength(6)
         self.ui.input_password.setMaxLength(8)
+
+        try:
+            conexion = conectar_bd()
+            conexion.cursor()
+        except:
+            
+            QMessageBox.critical(self, "Error", "No hay conexión a la base de datos. Verifica tu conexión e intenta de nuevo. Si el problema persiste, contacta con el servicio técnico.")
+            sys.exit(app.exec())
+
 
     def verificar_login(self):
         usuario_texto = self.ui.input_usuario.text()
