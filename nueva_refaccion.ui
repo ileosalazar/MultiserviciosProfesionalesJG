@@ -93,7 +93,7 @@
     <set>Qt::AlignmentFlag::AlignCenter</set>
    </property>
    <property name="placeholderText">
-    <string>1, 5, máx. 99</string>
+    <string>1, 5, máx. 100</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_2">

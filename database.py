@@ -1,6 +1,5 @@
 import psycopg
 
-
 URL_supabase = "postgresql://postgres.wwtmgbmaxyhklpqwuzbq:Multiservicios@aws-1-us-east-1.pooler.supabase.com:6543/postgres?sslmode=require"
 
 def conectar_bd():

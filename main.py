@@ -9,14 +9,6 @@ from datetime import date, timedelta
 import random
 import string
 
-def ruta_recurso(ruta_relativa):
-    try:
-        ruta_base = sys._MEIPASS
-    except Exception:
-        ruta_base = os.path.abspath(".")
-
-    return os.path.join(ruta_base, ruta_relativa)
-
 
 #Pantalla agendar cita desde admin
 class NuevaCitaWindow:
@@ -1083,6 +1075,14 @@ class DashboardAdmin:
             QMessageBox.warning(self.ui, "Error de Contraseña", "Las contraseñas del nuevo usuario no coinciden.")
             return
         
+        if len(nuevo_usuario) != 6:
+            QMessageBox.warning(self.ui, "Usuario Inválido", "El número de usuario debe ser de exactamente 6 dígitos.")
+            return
+        
+        if len(nueva_pass) != 8:
+            QMessageBox.warning(self.ui, "Contraseña Inválida", "La contraseña debe tener exactamente 8 caracteres.")
+            return
+
         try:
             cursor = conexion.cursor()
         
@@ -1765,6 +1765,7 @@ class DashboardCliente:
         self.ventana_agendar = AgendarClienteWindow()
         self.ventana_agendar.ui.show()
 
+
 #Pantalla login
 class LoginWindow(QMainWindow):
     def __init__(self):
@@ -1833,6 +1834,7 @@ class LoginWindow(QMainWindow):
         self.ventana_inicio = BienvenidaWindow()
         self.ventana_inicio.show()
         self.close()
+   
             
 #Pantalla inicial
 class BienvenidaWindow(QMainWindow):
@@ -1860,6 +1862,16 @@ class BienvenidaWindow(QMainWindow):
         self.ventana_cliente = DashboardCliente()
         self.ventana_cliente.ui.show() 
         self.close()
+
+
+def ruta_recurso(ruta_relativa):
+    try:
+        ruta_base = sys._MEIPASS
+    except Exception:
+        ruta_base = os.path.abspath(".")
+
+    return os.path.join(ruta_base, ruta_relativa)
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
