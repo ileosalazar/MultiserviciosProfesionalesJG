@@ -1,11 +1,13 @@
 import sys
 import os
-from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QTableWidgetItem, QInputDialog, QHeaderView
+import re
+from PySide6.QtWidgets import QApplication, QLineEdit, QMainWindow, QMessageBox, QTableWidgetItem, QInputDialog, QHeaderView, QFileDialog
 from PySide6.QtGui import QIcon, QRegularExpressionValidator, QIntValidator, QDoubleValidator 
 from PySide6.QtCore import QFile, QDate, QRegularExpression, Qt
 from PySide6.QtUiTools import QUiLoader
 from database import conectar_bd
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
+from fpdf import FPDF
 import random
 import string
 
@@ -29,6 +31,8 @@ class NuevaCitaWindow:
 
         self.ui.txt_nuevo_tipo.setMaxLength(30)
         self.ui.txt_nueva_marca.setMaxLength(25)
+
+        patron_letras = r"^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$"
 
         self.cargar_clientes()
 
@@ -130,6 +134,15 @@ class NuevaCitaWindow:
                 QMessageBox.warning(self, "Error", "Debes ingresar el tipo y marca del nuevo aparato.")
                 return
 
+            if not re.match(r"^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$", nuevo_tipo):
+                QMessageBox.warning(self.ui, "Error", "El tipo de aparato solo debe contener letras.")
+                return
+
+
+            if not re.match(r"^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$", nueva_marca):
+                QMessageBox.warning(self.ui, "Error", "La marca del aparato solo debe contener letras.")
+                return
+
             conexion = conectar_bd()
             if not conexion: return
             cursor = conexion.cursor()
@@ -193,7 +206,6 @@ class AgregarPiezaWindow:
         
         self.cargar_inventario_combo()
 
-        self.ui.input_cantidad.setValidator(validador_numeros)
         self.ui.input_cantidad.setMaxLength(5)
         
         self.ui.combo_refaccion.currentIndexChanged.connect(self.actualizar_etiquetas)
@@ -237,6 +249,10 @@ class AgregarPiezaWindow:
 
         if not datos or not cantidad_texto:
             QMessageBox.warning(self.ui, "Error", "Asegúrate de llenar la cantidad.")
+            return
+
+        if not cantidad_texto.isdigit():
+            QMessageBox.warning(self.ui, "Error", "La cantidad debe ser un número entero.")
             return
 
         try:
@@ -303,10 +319,6 @@ class NuevaRefaccionWindow:
         
         self.cargar_proveedores_combo()
 
-        self.ui.input_stock.setValidator(validador_stock)
-        self.ui.input_costo.setValidator(validador_dinero)
-        self.ui.input_precio.setValidator(validador_dinero)
-
         self.ui.input_nombre.setMaxLength(50)
         self.ui.input_stock.setMaxLength(3)
         self.ui.input_costo.setMaxLength(10)
@@ -339,11 +351,29 @@ class NuevaRefaccionWindow:
         stock = self.ui.input_stock.text().strip()
         costo = self.ui.input_costo.text().strip()
         precio = self.ui.input_precio.text().strip()
+
+        patron_letras = r"^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$"
         
         id_proveedor = self.ui.combo_proveedor.currentData()
 
         if not all([nombre, stock, costo, precio]):
             QMessageBox.warning(self.ui, "Error", "Llena todos los campos de texto.")
+            return
+
+        if not re.match(patron_letras, nombre):
+            QMessageBox.warning(self.ui, "Error", "El nombre de la refacción solo debe contener letras.")
+            return
+
+        if not stock.isdigit() or int(stock) < 0:
+            QMessageBox.warning(self.ui, "Error", "El stock debe ser un número entero no negativo.")
+            return
+
+        if not re.match(r"^\d+(\.\d{1,2})?$", costo) or float(costo) < 0:
+            QMessageBox.warning(self.ui, "Error", "El costo debe ser un número no negativo con hasta dos decimales.")
+            return
+
+        if not re.match(r"^\d+(\.\d{1,2})?$", precio) or float(precio) < 0:
+            QMessageBox.warning(self.ui, "Error", "El precio debe ser un número no negativo con hasta dos decimales.")
             return
 
         conexion = conectar_bd()
@@ -390,9 +420,6 @@ class DashboardAdmin:
         self.ui.input_nuevo_nombre.setMaxLength(25)
         self.ui.input_pass_actual.setMaxLength(8)
 
-        regex_numeros = QRegularExpression(r"^[0-9]+$")
-        validador_numeros = QRegularExpressionValidator(regex_numeros)
-        self.ui.input_nuevo_usuario.setValidator(validador_numeros)
 
         self.ui.btn_nueva_cita.clicked.connect(self.abrir_nueva_cita)
         self.ui.btn_editar_estado.clicked.connect(self.editar_estado)
@@ -402,10 +429,13 @@ class DashboardAdmin:
 
         self.ui.input_buscador.textChanged.connect(self.filtrar_tabla_citas)
         self.ui.tabla_citas.itemSelectionChanged.connect(self.mostrar_diagnostico_seleccionado)
+        self.ui.tabla_citas.itemSelectionChanged.connect(self.verificar_visibilidad_recibo_admin)
         self.ui.input_buscador_clientes.textChanged.connect(self.filtrar_tabla_clientes)
         self.ui.input_buscador_inventario.textChanged.connect(self.filtrar_tabla_inventario)
 
         self.ui.dt_fecha_admin.setMinimumDate(QDate.currentDate())
+        self.ui.btn_admin_recibo.setVisible(False)
+        self.ui.btn_admin_recibo.clicked.connect(self.accion_recibo_admin)
 
         self.ui.btn_salir.clicked.connect(self.cerrar_sesion)
 
@@ -448,10 +478,12 @@ class DashboardAdmin:
                 a.tipo || ' ' || a.marca AS aparato,
                 s.fecha_visita,
                 s.estado,
-                CASE 
-                    WHEN s.estado = 'Cancelado' THEN COALESCE(s.costo_revision, 0)
-                    ELSE (COALESCE(s.costo_revision, 0) + COALESCE(s.costo_mano_obra, 0) + COALESCE(SUM(d.cantidad * d.precio_unitario), 0))
-                END AS total,
+                ROUND(
+                    (CASE
+                        WHEN s.estado = 'Cancelado' THEN COALESCE(s.costo_revision, 0)
+                        ELSE (COALESCE(s.costo_revision, 0) + COALESCE(s.costo_mano_obra, 0) + COALESCE(SUM(d.cantidad * d.precio_unitario), 0))
+                    END) * 1.16
+                , 2) AS total,
                 TO_CHAR(s.fecha_estimada, 'DD-MM-YYYY') AS fecha_entrega            
             FROM servicios s
             JOIN aparatos a ON s.id_aparato = a.id 
@@ -606,6 +638,10 @@ class DashboardAdmin:
 
             diagnostico, ok_diag = QInputDialog.getMultiLineText(
                 self.ui, "Diagnóstico del Equipo", "Ingresa el diagnóstico y los detalles de la reparación propuesta:")
+
+            if not re.search(r"[a-zA-ZáéíóúÁÉÍÓÚñÑ]", diagnostico):
+                QMessageBox.warning(self.ui, "Error", "El diagnóstico debe contener al menos una letra.")
+                return
 
             if ok_diag:
 
@@ -766,6 +802,7 @@ class DashboardAdmin:
                 "Solo puedes eliminar de la base de datos las citas que ya estén en estado 'Cancelado'.\n\nSi necesitas borrarla, cancélala primero para asegurar que las piezas regresen al inventario."
                 )
                 return
+
             
             confirmacion = QMessageBox.question(
                 self.ui, 
@@ -813,6 +850,181 @@ class DashboardAdmin:
         except Exception as e:
             conexion.rollback()
             QMessageBox.critical(self.ui, "Error", f"No se pudo actualizar la fecha: {str(e)}")
+
+    def crear_pdf_recibo(self):
+        try:
+            conexion = conectar_bd()
+            cursor = conexion.cursor()
+
+            fila_actual = self.ui.tabla_citas.currentRow()
+            if fila_actual < 0:
+                return
+    
+            folio = self.ui.tabla_citas.item(fila_actual, 0).text().strip()
+
+            sql_general = """
+            SELECT 
+                s.id,
+                c.nombre || ' ' || c.apellido_paterno || ' ' || COALESCE(c.apellido_materno, '') AS cliente,
+                a.tipo || ' ' || a.marca AS equipo,
+                s.estado,
+                COALESCE(s.costo_revision, 0),
+                COALESCE(s.costo_mano_obra, 0)
+            FROM servicios s
+            JOIN aparatos a ON s.id_aparato = a.id
+            JOIN clientes c ON a.id_cliente = c.id
+            WHERE s.folio_seguimiento = %s
+            """
+            
+            cursor.execute(sql_general, (folio,))
+            datos = cursor.fetchone()
+
+            if not datos:
+                QMessageBox.warning(self.ui, "Aviso", "No se encontraron datos para generar el recibo.")
+                return
+
+            id_servicio, cliente, equipo, estado, costo_rev, costo_mo = datos
+            costo_rev = float(costo_rev)
+            costo_mo = float(costo_mo)
+
+            refacciones = []
+            if estado != "Cancelado":
+                sql_refacciones = """
+                SELECT r.nombre, d.cantidad, d.precio_unitario, (d.cantidad * d.precio_unitario)
+                FROM detalle_servicio d
+                JOIN refacciones r ON d.id_refaccion = r.id
+                WHERE d.id_servicio = %s
+                """
+                cursor.execute(sql_refacciones, (id_servicio,))
+                refacciones = cursor.fetchall()
+
+            ruta_archivo, _ = QFileDialog.getSaveFileName(
+                self.ui,
+                "Guardar Recibo de Pago",
+                f"Recibo_{folio}.pdf",
+                "Archivos PDF (*.pdf)"
+            )
+
+            if not ruta_archivo:
+                return
+
+            pdf = FPDF()
+            pdf.add_page()
+        
+            pdf.set_font("Helvetica", "B", 16)
+            pdf.cell(0, 10, "MULTISERVICIOS PROFESIONALES JG", ln=True, align="C")
+            pdf.set_font("Helvetica", "", 12)
+            pdf.cell(0, 8, "Dirección: Lens #805, Quinta Montecarlo, San Nicolás de los Garza, N.L., México", ln=True, align="C")
+            pdf.ln(5)
+            pdf.set_font("Helvetica", "", 10)
+            pdf.cell(0, 6, "Comprobante de Servicio y Orden de Pago", ln=True, align="C")
+            pdf.ln(8)
+
+            pdf.set_font("Helvetica", "B", 11)
+            pdf.cell(100, 7, f"Folio de Seguimiento: {folio}")
+            pdf.set_font("Helvetica", "", 10)
+            pdf.cell(0, 7, f"Fecha de emisión: {datetime.now().strftime('%d/%m/%Y %H:%M')}", ln=True, align="R")
+        
+            pdf.cell(0, 7, f"Cliente: {cliente}", ln=True)
+            pdf.cell(0, 7, f"Equipo: {equipo}", ln=True)
+            pdf.cell(0, 7, f"Estado del servicio: {estado}", ln=True)
+            pdf.ln(6)
+
+            pdf.set_fill_color(230, 230, 230)
+            pdf.set_font("Helvetica", "B", 10)
+            pdf.cell(110, 8, "Concepto / Descripción", border=1, fill=True)
+            pdf.cell(30, 8, "Cantidad", border=1, align="C", fill=True)
+            pdf.cell(50, 8, "Subtotal", border=1, align="R", fill=True, ln=True)
+
+            pdf.set_font("Helvetica", "", 10)
+            subtotal_neto = 0.0
+
+            if costo_rev > 0:
+                pdf.cell(110, 8, "Diagnóstico y Revisión Técnica", border=1)
+                pdf.cell(30, 8, "1", border=1, align="C")
+                pdf.cell(50, 8, f"${costo_rev:.2f}", border=1, align="R", ln=True)
+                subtotal_neto += costo_rev
+
+            if estado != "Cancelado":
+                if costo_mo > 0:
+                    pdf.cell(110, 8, "Mano de Obra por Reparación", border=1)
+                    pdf.cell(30, 8, "1", border=1, align="C")
+                    pdf.cell(50, 8, f"${costo_mo:.2f}", border=1, align="R", ln=True)
+                    subtotal_neto += costo_mo
+
+                for nombre_ref, cant, precio_u, sub in refacciones:
+                    sub = float(sub)
+                    pdf.cell(110, 8, f"Refacción: {nombre_ref}", border=1)
+                    pdf.cell(30, 8, str(cant), border=1, align="C")
+                    pdf.cell(50, 8, f"${sub:.2f}", border=1, align="R", ln=True)
+                    subtotal_neto += sub
+
+            iva = subtotal_neto * 0.16
+            total_con_iva = subtotal_neto + iva
+
+            pdf.cell(140, 8, "Subtotal:", border=1, align="R")
+            pdf.cell(50, 8, f"${subtotal_neto:.2f}", border=1, align="R", ln=True)
+
+            pdf.cell(140, 8, "IVA (16%):", border=1, align="R")
+            pdf.cell(50, 8, f"${iva:.2f}", border=1, align="R", ln=True)
+
+            pdf.set_font("Helvetica", "B", 11)
+            pdf.cell(140, 10, "TOTAL A PAGAR:", border=1, align="R", fill=True)
+            pdf.cell(50, 10, f"${total_con_iva:.2f} MXN", border=1, align="R", fill=True, ln=True)
+            pdf.ln(10)
+
+            pdf.set_fill_color(245, 248, 255)
+            pdf.set_font("Helvetica", "B", 11)
+            pdf.cell(0, 8, "Instrucciones para el pago", ln=True, fill=True)
+            pdf.set_font("Helvetica", "", 10)
+            pdf.multi_cell(
+                0, 6,
+                "1. Transferencia Electrónica (SPEI) o Depósito:\n"
+                "   - Banco: NU Bank\n"
+                "   - Beneficiario: Juan Gabriel Martínez.\n"
+                "   - CLABE Interbancaria: 638180000006776183\n"
+                f"   - Concepto de pago: {folio}\n\n"
+                "2. Pago en Efectivo o Tarjeta física:\n"
+                "   - Puede realizar su pago directamente en mostrador en nuestra sucursal al momento de recoger su equipo.\n"
+                "   - Nota: En caso de transferencia, favor de presentar su comprobante en sucursal."
+            )
+
+            pdf.output(ruta_archivo)
+            os.startfile(ruta_archivo)
+
+        except Exception as e:
+            QMessageBox.critical(self.ui, "Error", f"No se pudo generar el recibo: {str(e)}")
+        finally:
+            if 'conexion' in locals() and conexion:
+                cursor.close()
+                conexion.close()
+
+    def verificar_visibilidad_recibo_admin(self):
+        fila_actual = self.ui.tabla_citas.currentRow()
+    
+        if fila_actual < 0:
+            self.ui.btn_admin_recibo.setVisible(False)
+            return
+
+        estado = self.ui.tabla_citas.item(fila_actual, 4).text().strip()
+        total_texto = self.ui.tabla_citas.item(fila_actual, 5).text().replace("$", "").replace(",", "").strip()
+    
+        try:
+            total_valor = float(total_texto)
+        except ValueError:
+            total_valor = 0.0
+
+        if estado in ["En Servicio", "Terminado", "En revisión"] or (estado == "Cancelado" and total_valor > 0):
+            self.ui.btn_admin_recibo.setVisible(True)
+        else:
+            self.ui.btn_admin_recibo.setVisible(False)
+
+    def accion_recibo_admin(self):
+        fila_actual = self.ui.tabla_citas.currentRow()
+        if fila_actual >= 0:
+            folio_seleccionado = self.ui.tabla_citas.item(fila_actual, 0).text().strip()
+            self.crear_pdf_recibo()
+
 
     def mostrar_diagnostico_seleccionado(self):
         fila = self.ui.tabla_citas.currentRow()
@@ -1071,6 +1283,14 @@ class DashboardAdmin:
             QMessageBox.warning(self.ui, "Campos Incompletos", "Por favor llena todos los campos.")
             return
         
+        if not re.match(r"^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$", nuevo_nombre):
+            QMessageBox.warning(self.ui, "Nombre Inválido", "El nombre del nuevo usuario solo debe contener letras y espacios.")
+            return
+
+        if not re.match(r"^[0-9]+$", nuevo_usuario):
+            QMessageBox.warning(self.ui, "Usuario Inválido", "El número de usuario solo debe contener dígitos.")
+            return
+
         if nueva_pass != confirmar_pass:
             QMessageBox.warning(self.ui, "Error de Contraseña", "Las contraseñas del nuevo usuario no coinciden.")
             return
@@ -1086,14 +1306,14 @@ class DashboardAdmin:
         try:
             cursor = conexion.cursor()
         
-            cursor.execute("SELECT password FROM usuarios WHERE usuario = %s", (self.usuario_actual,))
+            cursor.execute("SELECT id FROM usuarios WHERE usuario = %s AND password = crypt(%s, password)", (self.usuario_actual, pass_actual_ingresada))
             resultado = cursor.fetchone()
         
-            if not resultado or resultado[0] != pass_actual_ingresada:
+            if not resultado:
                 QMessageBox.critical(self.ui, "Acceso Denegado", "Tu contraseña de administrador actual es incorrecta. Operación cancelada.")
                 return
             
-            sql_insert = "INSERT INTO usuarios (nombre_corto, usuario, password) VALUES (%s, %s, %s)"
+            sql_insert = "INSERT INTO usuarios (nombre_corto, usuario, password) VALUES (%s, %s, crypt(%s, gen_salt('bf')))"
             cursor.execute(sql_insert, (nuevo_nombre, nuevo_usuario, nueva_pass))
             conexion.commit()
         
@@ -1192,6 +1412,14 @@ class EditarStockWindow:
         if not all([sumar_str, costo_str, precio_str]):
             QMessageBox.warning(self.ui, "Error", "No dejes campos vacíos.")
             return
+
+        if not re.match(r"^\d+$", sumar_str):
+            QMessageBox.warning(self.ui, "Error", "Ingresa solo números enteros para el stock.")
+            return
+        
+        if not re.match(r"^\d+(\.\d{1,2})?$", costo_str) or not re.match(r"^\d+(\.\d{1,2})?$", precio_str):
+            QMessageBox.warning(self.ui, "Error", "Ingresa solo números válidos para costo y precio (máximo 2 decimales).")
+            return
             
         conexion = conectar_bd()
         if not conexion: return
@@ -1240,13 +1468,6 @@ class AgendarClienteWindow:
         archivo.close()
         self.ui.input_fecha.setMinimumDate(QDate.currentDate())
 
-        self.ui.input_nombre.setValidator(validador_letras)
-        self.ui.input_apellidop.setValidator(validador_letras)
-        self.ui.input_apellidom.setValidator(validador_letras)
-        self.ui.input_telefono.setValidator(validador_numeros)
-        self.ui.txt_cp.setValidator(validador_numeros)
-        self.ui.txt_municipio.setValidator(validador_letras)
-
         self.ui.input_nombre.setMaxLength(30)
         self.ui.input_apellidop.setMaxLength(25)
         self.ui.input_apellidom.setMaxLength(25)
@@ -1280,9 +1501,56 @@ class AgendarClienteWindow:
         cp = self.ui.txt_cp.text().strip()
         municipio = self.ui.txt_municipio.text().strip()
 
+        patron_letras = r"^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$"
+
         if not all([nombre, apellidop, apellidom, telefono, tipo, marca, fecha, calle, numero, colonia, cp, municipio]):
             QMessageBox.warning(self.ui, "Faltan datos", "Por favor llena todos los campos.")
             return
+
+        if not re.match(patron_letras, nombre):
+            QMessageBox.warning(self.ui, "Dato Inválido", "El nombre solo debe contener letras.")
+            return
+
+        if not re.match(patron_letras, apellidop):
+            QMessageBox.warning(self.ui, "Dato Inválido", "El apellido paterno solo debe contener letras.")
+            return
+
+        if apellidom and not re.match(patron_letras, apellidom):
+            QMessageBox.warning(self.ui, "Dato Inválido", "El apellido materno solo debe contener letras.")
+            return
+        
+        if not telefono.isdigit() or len(telefono) != 10:
+            QMessageBox.warning(self.ui, "Teléfono Inválido", "El teléfono debe contener exactamente 10 números.")
+            return
+        
+        if not re.match(patron_letras, tipo):
+            QMessageBox.warning(self.ui, "Dato Inválido", "El tipo de aparato solo debe contener letras.")
+            return
+
+        if not re.match(patron_letras, marca):
+            QMessageBox.warning(self.ui, "Dato Inválido", "La marca del aparato solo debe contener letras.")
+            return
+
+        if not re.match(patron_letras, calle):
+            QMessageBox.warning(self.ui, "Dato Inválido", "La calle solo debe contener letras.")
+            return
+
+        if not re.search(r"\d", numero):
+            QMessageBox.warning(self.ui, "Número Inválido", "El número de domicilio debe contener al menos un dígito numérico.")
+            return
+        
+        if not re.search(r"[a-zA-ZáéíóúÁÉÍÓÚñÑ]", colonia):
+            QMessageBox.warning(self.ui, "Colonia Inválida", "El nombre de la colonia debe contener al menos una letra.")
+            return
+        
+        if cp and (not cp.isdigit() or len(cp) != 5):
+            QMessageBox.warning(self.ui, "C.P. Inválido", "El código postal debe ser de 5 dígitos numéricos.")
+            return
+        
+        if not re.match(patron_letras, municipio):
+            QMessageBox.warning(self.ui, "Dato Inválido", "El municipio solo debe contener letras.")
+            return
+
 
         conexion = conectar_bd()
         if not conexion: return
@@ -1349,13 +1617,6 @@ class NuevoClienteWindow:
         self.ui = loader.load(archivo)
         archivo.close()
 
-        self.ui.input_nombre.setValidator(validador_letras)
-        self.ui.input_paterno.setValidator(validador_letras)
-        self.ui.input_materno.setValidator(validador_letras)
-        self.ui.input_telefono.setValidator(validador_numeros)
-        self.ui.txt_cp.setValidator(validador_numeros)
-        self.ui.txt_municipio.setValidator(validador_letras)
-
         self.ui.input_telefono.setMaxLength(10)
         self.ui.input_nombre.setMaxLength(30)
         self.ui.input_paterno.setMaxLength(25)
@@ -1383,10 +1644,48 @@ class NuevoClienteWindow:
         numero = self.ui.txt_numero.text().strip()
         colonia = self.ui.txt_colonia.text().strip()
         cp = self.ui.txt_cp.text().strip()
-        municipio = self.ui.txt_municipio.text().strip()   
+        municipio = self.ui.txt_municipio.text().strip() 
+
+        patron_letras = r"^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$"  
 
         if not all([nombre, paterno, materno, telefono, calle, numero, colonia, cp, municipio]):
             QMessageBox.warning(self.ui, "Faltan datos", "Por favor llena todos los campos.")
+            return
+        
+        if not re.match(patron_letras, nombre):
+            QMessageBox.warning(self.ui, "Dato Inválido", "El nombre solo debe contener letras.")
+            return
+
+        if not re.match(patron_letras, paterno):
+            QMessageBox.warning(self.ui, "Dato Inválido", "El apellido paterno solo debe contener letras.")
+            return
+
+        if not re.match(patron_letras, materno):
+            QMessageBox.warning(self.ui, "Dato Inválido", "El apellido materno solo debe contener letras.")
+            return
+
+        if not telefono.isdigit() or len(telefono) != 10:
+            QMessageBox.warning(self.ui, "Teléfono Inválido", "El teléfono debe contener exactamente 10 números.")
+            return
+        
+        if not re.match(patron_letras, calle):
+            QMessageBox.warning(self.ui, "Dato Inválido", "La calle solo debe contener letras.")
+            return
+
+        if not re.search(r"\d", numero):
+            QMessageBox.warning(self.ui, "Número Inválido", "El número de domicilio debe contener al menos un dígito numérico.")
+            return
+        
+        if not re.search(r"[a-zA-ZáéíóúÁÉÍÓÚñÑ]", colonia):
+            QMessageBox.warning(self.ui, "Colonia Inválida", "El nombre de la colonia debe contener al menos una letra.")
+            return
+
+        if cp and (not cp.isdigit() or len(cp) != 5):
+            QMessageBox.warning(self.ui, "C.P. Inválido", "El código postal debe ser de 5 dígitos numéricos.")
+            return
+
+        if not re.match(patron_letras, municipio):
+            QMessageBox.warning(self.ui, "Dato Inválido", "El municipio solo debe contener letras.")
             return
 
         conexion = conectar_bd()
@@ -1459,10 +1758,12 @@ class HistorialClienteWindow:
                 a.tipo || ' ' || a.marca AS aparato,
                 s.fecha_visita,
                 s.estado,
-                CASE 
-                    WHEN s.estado = 'Cancelado' THEN COALESCE(s.costo_revision, 0)
-                    ELSE (COALESCE(s.costo_revision, 0) + COALESCE(s.costo_mano_obra, 0) + COALESCE(SUM(d.cantidad * d.precio_unitario), 0))
-                END AS total_pagado
+                ROUND(
+                    (CASE
+                        WHEN s.estado = 'Cancelado' THEN COALESCE(s.costo_revision, 0)
+                        ELSE (COALESCE(s.costo_revision, 0) + COALESCE(s.costo_mano_obra, 0) + COALESCE(SUM(d.cantidad * d.precio_unitario), 0))
+                    END) * 1.16
+                , 2) AS total,
             FROM servicios s
             JOIN aparatos a ON s.id_aparato = a.id
             LEFT JOIN detalle_servicio d ON s.id = d.id_servicio
@@ -1510,7 +1811,6 @@ class NuevoProveedorWindow:
         
         self.ui.setWindowTitle("Registrar Nuevo Proveedor")
 
-        self.ui.input_telefono.setValidator(validador_numeros)
         self.ui.input_telefono.setMaxLength(10)
 
         self.ui.input_empresa.setMaxLength(50)
@@ -1533,6 +1833,19 @@ class NuevoProveedorWindow:
         if not empresa:
             QMessageBox.warning(self.ui, "Error", "El nombre de la empresa es obligatorio.")
             return
+
+        if not re.search(r"[a-zA-ZáéíóúÁÉÍÓÚñÑ]", empresa):
+            QMessageBox.warning(self.ui, "Empresa Inválida", "El nombre de la empresa debe contener al menos una letra.")
+            return
+
+        if contacto and not re.search(r"[a-zA-ZáéíóúÁÉÍÓÚñÑ]", contacto):
+            QMessageBox.warning(self.ui, "Contacto Inválido", "El nombre del contacto debe contener al menos una letra.")
+            return
+
+        if telefono and (not telefono.isdigit() or len(telefono) != 10):
+            QMessageBox.warning(self.ui, "Teléfono Inválido", "El teléfono debe contener exactamente 10 números.")
+            return
+        
 
         conexion = conectar_bd()
         if not conexion: return
@@ -1579,6 +1892,18 @@ class DashboardCliente:
         self.ui.btn_agendar_nueva.clicked.connect(self.abrir_agendar)
         self.ui.btn_aprobar.clicked.connect(self.aprobar_presupuesto)
         self.ui.btn_rechazar.clicked.connect(self.rechazar_presupuesto)
+        self.ui.btn_ir_recuperar.clicked.connect(self.mostrar_pagina_recuperacion)
+        self.ui.btn_volver_consulta.clicked.connect(self.mostrar_pagina_consulta)
+        self.ui.btn_buscar_folio_perdido.clicked.connect(self.recuperar_folio_cliente)
+        self.ui.btn_cancelar_cita.setVisible(False)
+        self.ui.btn_cancelar_cita.clicked.connect(self.cancelar_cita_cliente)
+        self.ui.btn_generar_recibo.clicked.connect(self.generar_recibo_pdf)
+
+        self.ui.frame_resultados.setVisible(False)
+        self.ui.frame_aprobacion.setVisible(False)
+        self.ui.btn_generar_recibo.setVisible(False)
+        self.ui.lbl_recibo.setVisible(False)
+        self.ui.stackedWidget.setCurrentIndex(0)
 
         self.ui.input_folio.setMaxLength(8)
 
@@ -1602,16 +1927,17 @@ class DashboardCliente:
         
         try:
             cursor = conexion.cursor()
-            #Consulta SQL usando folio del cliente
             sql = """
                 SELECT 
-                    c.nombre,
+                    TRIM(c.nombre || ' ' || c.apellido_paterno || ' ' || COALESCE(c.apellido_materno, '')) AS nombre_cliente,
                     a.tipo || ' ' || a.marca AS aparato,
                     s.estado,
-                    CASE 
-                        WHEN s.estado = 'Cancelado' THEN COALESCE(s.costo_revision, 0)
-                        ELSE (COALESCE(s.costo_revision, 0) + COALESCE(s.costo_mano_obra, 0) + COALESCE(SUM(d.cantidad * d.precio_unitario), 0))
-                    END AS total,
+                    ROUND(
+                        (CASE
+                            WHEN s.estado = 'Cancelado' THEN COALESCE(s.costo_revision, 0)
+                            ELSE (COALESCE(s.costo_revision, 0) + COALESCE(s.costo_mano_obra, 0) + COALESCE(SUM(d.cantidad * d.precio_unitario), 0))
+                        END) * 1.16
+                    , 2) AS total,
                     s.diagnostico,
                     TO_CHAR(s.fecha_estimada, 'DD-MM-YYYY') AS fecha_entrega
                 FROM servicios s
@@ -1619,19 +1945,20 @@ class DashboardCliente:
                 JOIN clientes c ON a.id_cliente = c.id
                 LEFT JOIN detalle_servicio d ON d.id_servicio = s.id
                 WHERE s.folio_seguimiento = %s
-                GROUP BY s.id, c.nombre, a.tipo, a.marca, s.diagnostico, s.fecha_estimada
+                GROUP BY s.id, c.nombre, c.apellido_paterno, c.apellido_materno, a.tipo, a.marca, s.diagnostico, s.fecha_estimada
             """
             cursor.execute(sql, (folio_texto,))
             resultado = cursor.fetchone()
             
             if resultado:
 
+                self.ui.frame_resultados.setVisible(True)
                 self.folio_confirmado = folio_texto
                 self.ui.lbl_cliente.setText(f"Cliente: {resultado[0]}")
                 self.ui.lbl_aparato.setText(f"Aparato: {resultado[1]}")
                 self.ui.lbl_estado.setText(f"Estado Actual: {resultado[2]}")
                 self.ui.lbl_total.setText(f"Total a pagar: ${resultado[3]:.2f}")
-                self.ui.lbl_fecha_entrega.setText(f"Fecha de entrega estimada: ")
+                self.ui.lbl_fecha_entrega.setText(f"Fecha de entrega estimada: {resultado[5] or 'Pendiente'}")
 
                 diagnostico_bd = resultado[4]
                 if diagnostico_bd:
@@ -1639,19 +1966,29 @@ class DashboardCliente:
                 else:
                     self.ui.lbl_diagnostico.setText("Diagnóstico: Tu aparato aún no ha sido revisado.")
 
+                if resultado[2] in ["En Servicio", "Terminado", "En revisión"] or (resultado[2] == "Cancelado" and resultado[3] > 0):
+                    self.ui.btn_generar_recibo.setVisible(True)
+                    self.ui.lbl_recibo.setVisible(True)
+                else:
+                    self.ui.btn_generar_recibo.setVisible(False)
+
                 if resultado[2] == 'Esperando aprobación del cliente':
                     self.ui.btn_aprobar.setEnabled(True)
                     self.ui.btn_rechazar.setEnabled(True)
+                    self.ui.frame_aprobacion.setVisible(True)
                     self.ui.lbl_fecha_entrega.setText("Fecha de entrega estimada: Esperando aprobación del servicio.")
                 else:
                     self.ui.btn_aprobar.setEnabled(False)
                     self.ui.btn_rechazar.setEnabled(False)
+                    self.ui.frame_aprobacion.setVisible(False)
 
                     if resultado[2] == 'En Servicio' and resultado[5]:
                         self.ui.lbl_fecha_entrega.setText(f"Fecha de entrega estimada: {resultado[5]}")
 
                 if resultado[2] == 'Pendiente':
                     self.ui.lbl_estado.setStyleSheet("font-weight: bold; font-size: 12px;")
+                    self.ui.btn_cancelar_cita.setVisible(True)
+                    self.ui.btn_cancelar_cita.setEnabled(True)
                 elif resultado[2] == 'Terminado':
                     self.ui.lbl_estado.setStyleSheet("font-weight: bold; font-size: 12px;")
                     self.ui.lbl_fecha_entrega.setText(f"Fecha de entrega estimada: {resultado[5]}")
@@ -1665,6 +2002,7 @@ class DashboardCliente:
                 self.ui.lbl_total.setText("Total a pagar: ")
                 self.ui.lbl_diagnostico.setText("Diagnóstico: ")
                 self.ui.lbl_fecha_entrega.setText("Fecha de entrega estimada: ")
+                self.ui.btn_cancelar_cita.setVisible(False)
 
         except Exception as e:
             QMessageBox.critical(self.ui, "Error", f"Fallo al consultar:\n{e}, contacte con soporte técnico.")
@@ -1756,6 +2094,271 @@ class DashboardCliente:
                 cursor.close()
                 conexion.close()
 
+    def recuperar_folio_cliente(self):
+        telefono = self.ui.input_rec_telefono.text().strip()
+        apellido = self.ui.input_rec_apellido.text().strip()
+        aparato = self.ui.input_rec_aparato.text().strip()
+
+        if not telefono or not apellido or not aparato:
+            QMessageBox.warning(self.ui, "Campos Incompletos", "Por favor ingresa tu teléfono, apellido paterno y el tipo de aparato.")
+            return
+
+        if not telefono.isdigit() or len(telefono) != 10:
+            QMessageBox.warning(self.ui, "Teléfono Inválido", "El teléfono debe contener exactamente 10 dígitos numéricos.")
+            return
+
+        if not re.match(r"^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$", apellido):
+            QMessageBox.warning(self.ui, "Dato Inválido", "El apellido solo debe contener letras.")
+            return
+
+        if not re.match(r"^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$", aparato):
+            QMessageBox.warning(self.ui, "Dato Inválido", "El tipo de aparato solo debe contener letras.")
+            return
+
+        try:
+            conexion = conectar_bd()
+            cursor = conexion.cursor()
+
+            sql = """
+            SELECT 
+                s.folio_seguimiento
+            FROM servicios s
+            JOIN aparatos a ON s.id_aparato = a.id
+            JOIN clientes c ON a.id_cliente = c.id
+            WHERE c.telefono = %s
+              AND c.apellido_paterno ILIKE %s
+              AND a.tipo ILIKE %s
+              AND s.estado NOT IN ('Entregado', 'Cancelado')
+            ORDER BY s.id DESC
+            LIMIT 1
+            """
+        
+            cursor.execute(sql, (telefono, apellido, aparato))
+            resultado = cursor.fetchone()
+
+            if resultado:
+                folio_encontrado = resultado
+            
+                self.ui.lbl_folio_recuperado.setText(
+                    f"Folio encontrado: {folio_encontrado}\n"
+                )
+            
+            else:
+                self.ui.lbl_folio_recuperado.clear()
+                QMessageBox.information(
+                    self.ui, 
+                    "Sin coincidencias", 
+                    "No se encontró ninguna cita activa con esos datos.\nVerifica que el teléfono y apellido coincidan con los registrados."
+                )
+
+        except Exception as e:
+            QMessageBox.critical(self.ui, "Error de Conexión", f"Ocurrió un problema al buscar el folio: {str(e)}")
+        finally:
+            cursor.close()
+            conexion.close()
+
+
+    def cancelar_cita_cliente(self):
+        respuesta = QMessageBox.question(
+            self.ui,
+            "Confirmar Cancelación",
+            f"¿Estás seguro de que deseas cancelar la cita con folio {self.folio_confirmado}?\n"
+            "Esta acción no se puede deshacer.",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No
+        )
+    
+        if respuesta != QMessageBox.Yes:
+            return
+
+        try:
+            conexion = conectar_bd()
+            cursor = conexion.cursor()
+        
+            sql = """
+            UPDATE servicios 
+            SET estado = 'Cancelado' 
+            WHERE folio_seguimiento = %s AND estado = 'Pendiente'
+            """
+            cursor.execute(sql, (self.folio_confirmado,))
+        
+            if cursor.rowcount > 0:
+                conexion.commit()
+                QMessageBox.information(self.ui, "Cita Cancelada", "Tu cita ha sido cancelada exitosamente.")
+            
+                self.ui.lbl_estado.setText("Estado Actual: Cancelado")
+                self.ui.btn_cancelar_cita.setVisible(False)
+            else:
+                conexion.rollback()
+                QMessageBox.warning(
+                    self.ui, 
+                    "No disponible", 
+                    "La cita ya no se encuentra en estado Pendiente y no puede ser cancelada por este medio."
+                )
+            
+        except Exception as e:
+            if 'conexion' in locals() and conexion:
+                conexion.rollback()
+            QMessageBox.critical(self.ui, "Error", f"No se pudo cancelar la cita: {str(e)}")
+        finally:
+            cursor.close()
+            conexion.close()
+
+    def generar_recibo_pdf(self):
+        try:
+            conexion = conectar_bd()
+            cursor = conexion.cursor()
+
+            sql_general = """
+            SELECT 
+                s.id,
+                c.nombre || ' ' || c.apellido_paterno || ' ' || COALESCE(c.apellido_materno, '') AS cliente,
+                a.tipo || ' ' || a.marca AS equipo,
+                s.estado,
+                COALESCE(s.costo_revision, 0),
+                COALESCE(s.costo_mano_obra, 0)
+            FROM servicios s
+            JOIN aparatos a ON s.id_aparato = a.id
+            JOIN clientes c ON a.id_cliente = c.id
+            WHERE s.folio_seguimiento = %s
+            """
+            cursor.execute(sql_general, (self.folio_confirmado,))
+            datos = cursor.fetchone()
+
+            if not datos:
+                QMessageBox.warning(self.ui, "Error", "No se encontraron datos para el folio especificado.")
+                return
+
+            id_servicio, cliente, equipo, estado, costo_rev, costo_mo = datos
+            costo_rev = float(costo_rev)
+            costo_mo = float(costo_mo)
+
+            refacciones = []
+            if estado != "Cancelado":
+                sql_refacciones = """
+                SELECT r.nombre, d.cantidad, d.precio_unitario, (d.cantidad * d.precio_unitario)
+                FROM detalle_servicio d
+                JOIN refacciones r ON d.id_refaccion = r.id
+                WHERE d.id_servicio = %s
+                """
+                cursor.execute(sql_refacciones, (id_servicio,))
+                refacciones = cursor.fetchall()
+
+            ruta_archivo, _ = QFileDialog.getSaveFileName(
+                self.ui,
+                "Guardar Recibo de Pago",
+                f"Recibo_{self.folio_confirmado}.pdf",
+                "Archivos PDF (*.pdf)"
+            )
+
+            if not ruta_archivo:
+                return
+
+            pdf = FPDF()
+            pdf.add_page()
+        
+            pdf.set_font("Helvetica", "B", 16)
+            pdf.cell(0, 10, "MULTISERVICIOS PROFESIONALES JG", ln=True, align="C")
+            pdf.set_font("Helvetica", "", 12)
+            pdf.cell(0, 8, "Dirección: Lens #805, Quinta Montecarlo, San Nicolás de los Garza, N.L., México", ln=True, align="C")
+            pdf.ln(5)
+            pdf.set_font("Helvetica", "", 10)
+            pdf.cell(0, 6, "Comprobante de Servicio y Orden de Pago", ln=True, align="C")
+            pdf.ln(8)
+
+            pdf.set_font("Helvetica", "B", 11)
+            pdf.cell(100, 7, f"Folio de Seguimiento: {self.folio_confirmado}")
+            pdf.set_font("Helvetica", "", 10)
+            pdf.cell(0, 7, f"Fecha de emisión: {datetime.now().strftime('%d/%m/%Y %H:%M')}", ln=True, align="R")
+        
+            pdf.cell(0, 7, f"Cliente: {cliente}", ln=True)
+            pdf.cell(0, 7, f"Aparato: {equipo}", ln=True)
+            pdf.cell(0, 7, f"Estado del servicio: {estado}", ln=True)
+            pdf.ln(6)
+
+            pdf.set_fill_color(230, 230, 230)
+            pdf.set_font("Helvetica", "B", 10)
+            pdf.cell(110, 8, "Concepto / Descripción", border=1, fill=True)
+            pdf.cell(30, 8, "Cantidad", border=1, align="C", fill=True)
+            pdf.cell(50, 8, "Subtotal", border=1, align="R", fill=True, ln=True)
+
+            pdf.set_font("Helvetica", "", 10)
+            total_pagar = 0.0
+
+            if costo_rev > 0:
+                pdf.cell(110, 8, "Diagnóstico y Revisión Técnica", border=1)
+                pdf.cell(30, 8, "1", border=1, align="C")
+                pdf.cell(50, 8, f"${costo_rev:.2f}", border=1, align="R", ln=True)
+                total_pagar += costo_rev
+
+            if estado != "Cancelado":
+                if costo_mo > 0:
+                    pdf.cell(110, 8, "Mano de Obra por Reparación", border=1)
+                    pdf.cell(30, 8, "1", border=1, align="C")
+                    pdf.cell(50, 8, f"${costo_mo:.2f}", border=1, align="R", ln=True)
+                    total_pagar += costo_mo
+
+                for nombre_ref, cant, precio_u, sub in refacciones:
+                    sub = float(sub)
+                    pdf.cell(110, 8, f"Refacción: {nombre_ref}", border=1)
+                    pdf.cell(30, 8, str(cant), border=1, align="C")
+                    pdf.cell(50, 8, f"${sub:.2f}", border=1, align="R", ln=True)
+                    total_pagar += sub
+
+            subtotal_neto = total_pagar
+            iva = subtotal_neto * 0.16
+            total_con_iva = subtotal_neto + iva
+
+            pdf.set_font("Helvetica", "", 10)
+            pdf.cell(140, 8, "Subtotal:", border=1, align="R")
+            pdf.cell(50, 8, f"${subtotal_neto:.2f}", border=1, align="R", ln=True)
+
+            pdf.cell(140, 8, "IVA (16%):", border=1, align="R")
+            pdf.cell(50, 8, f"${iva:.2f}", border=1, align="R", ln=True)
+
+            pdf.set_font("Helvetica", "B", 11)
+            pdf.cell(140, 10, "Total a Pagar:", border=1, align="R", fill=True)
+            pdf.cell(50, 10, f"${total_con_iva:.2f} MXN", border=1, align="R", fill=True, ln=True)
+            pdf.ln(10)
+
+
+            pdf.set_fill_color(245, 248, 255)
+            pdf.set_font("Helvetica", "B", 11)
+            pdf.cell(0, 8, "Instrucciones para el pago", ln=True, fill=True)
+            pdf.set_font("Helvetica", "", 10)
+            pdf.multi_cell(
+                0, 6,
+                "1. Transferencia Electrónica (SPEI) o Depósito:\n"
+                "   - Banco: NU Bank\n"
+                "   - Beneficiario: Juan Gabriel Martínez.\n"
+                "   - CLABE Interbancaria: 638180000006776183\n"
+                f"   - Concepto de pago: {self.folio_confirmado}\n\n"
+                "2. Pago en Efectivo o Tarjeta física:\n"
+                "   - Puede realizar su pago directamente en mostrador en nuestra sucursal al momento de recoger su equipo.\n"
+                "   - Nota: En caso de transferencia, favor de presentar su comprobante en sucursal."
+            )
+
+            pdf.output(ruta_archivo)
+            os.startfile(ruta_archivo)
+
+        except Exception as e:
+            QMessageBox.critical(self.ui, "Error", f"No se pudo generar el recibo: {str(e)}")
+        finally:
+            if 'conexion' in locals() and conexion:
+                cursor.close()
+                conexion.close()
+
+    def mostrar_pagina_recuperacion(self):
+        self.ui.input_rec_telefono.clear()
+        self.ui.input_rec_apellido.clear()
+        self.ui.input_rec_aparato.clear()
+        self.ui.lbl_folio_recuperado.clear()
+        
+        self.ui.stackedWidget.setCurrentIndex(1)
+
+    def mostrar_pagina_consulta(self):
+        self.ui.stackedWidget.setCurrentIndex(0)
+
     def volver_inicio(self):
         self.ventana_inicio = BienvenidaWindow()
         self.ventana_inicio.show()
@@ -1781,6 +2384,7 @@ class LoginWindow(QMainWindow):
 
         self.ui.btn_entrar.clicked.connect(self.verificar_login)
         self.ui.btn_volver.clicked.connect(self.volver_bienvenida)
+        self.ui.btn_ver_password.clicked.connect(self.alternar_visibilidad_password)
 
         self.ui.input_usuario.setMaxLength(6)
         self.ui.input_password.setMaxLength(8)
@@ -1809,7 +2413,7 @@ class LoginWindow(QMainWindow):
             
         try:
             cursor = conexion.cursor()
-            sql = "SELECT nombre_corto FROM usuarios WHERE usuario = %s AND password = %s"
+            sql = "SELECT nombre_corto FROM usuarios WHERE usuario = %s AND password = crypt(%s, password)"
             cursor.execute(sql, (usuario_texto, password_texto))
             resultado = cursor.fetchone() 
 
@@ -1829,6 +2433,13 @@ class LoginWindow(QMainWindow):
         finally:
             cursor.close()
             conexion.close()
+
+    def alternar_visibilidad_password(self):
+        if self.ui.input_password.echoMode() == QLineEdit.Password:
+            self.ui.input_password.setEchoMode(QLineEdit.Normal)
+        else:
+            self.ui.input_password.setEchoMode(QLineEdit.Password)
+
 
     def volver_bienvenida(self):
         self.ventana_inicio = BienvenidaWindow()
@@ -1877,12 +2488,6 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
 
     os.chdir(ruta_recurso("."))
-
-    regla_texto = QRegularExpression(r"^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$")
-    validador_letras = QRegularExpressionValidator(regla_texto)
-
-    regla_numeros = QRegularExpression(r"^[0-9]+$")
-    validador_numeros = QRegularExpressionValidator(regla_numeros)
 
     validador_stock = QIntValidator(0, 9999)
     validador_dinero = QDoubleValidator(0.00, 99999.99, 2)
