@@ -1903,6 +1903,7 @@ class DashboardCliente:
         self.ui.frame_aprobacion.setVisible(False)
         self.ui.btn_generar_recibo.setVisible(False)
         self.ui.lbl_recibo.setVisible(False)
+        self.ui.btn_cancelar_cita.setVisible(False)
         self.ui.stackedWidget.setCurrentIndex(0)
 
         self.ui.input_folio.setMaxLength(8)
@@ -1924,6 +1925,7 @@ class DashboardCliente:
             
         conexion = conectar_bd()
         if not conexion: return
+
         
         try:
             cursor = conexion.cursor()
@@ -1971,6 +1973,7 @@ class DashboardCliente:
                     self.ui.lbl_recibo.setVisible(True)
                 else:
                     self.ui.btn_generar_recibo.setVisible(False)
+                    self.ui.lbl_recibo.setVisible(False)
 
                 if resultado[2] == 'Esperando aprobación del cliente':
                     self.ui.btn_aprobar.setEnabled(True)
